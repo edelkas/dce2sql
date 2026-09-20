@@ -1,0 +1,15 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.venv/
+venv/
+
+# Databases produced by running the tool
+*.db
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3

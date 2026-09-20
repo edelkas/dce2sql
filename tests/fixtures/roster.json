@@ -1,0 +1,2148 @@
+{
+  "mod": {
+    "normal": false
+  },
+  "guild": {
+    "id": "197765375503368192",
+    "name": "N++",
+    "iconUrl": "https://cdn.discordapp.com/icons/197765375503368192/a_52cdcaf70fc54f80e6eb3ce3d7ebe42e.gif?size=512",
+    "description": "N++ is a fast-paced, momentum-based platformer about dodging around obstacles and narrowly evading enemies.",
+    "vanityUrl": "https://discord.gg/nplusplus",
+    "bannerUrl": null,
+    "splashUrl": "https://cdn.discordapp.com/splashes/197765375503368192/5394cd5a3c91a6e01ac8f0db4ac303b0.png?size=512",
+    "ownerId": "198163965031743498",
+    "premiumTier": 1,
+    "premiumSubscriptionCount": 5,
+    "approximateMemberCount": 5215,
+    "approximatePresenceCount": 815,
+    "roles": [
+      {
+        "id": "115385224119975941",
+        "name": "DSL",
+        "color": null,
+        "position": 48
+      },
+      {
+        "id": "197765375503368192",
+        "name": "@everyone",
+        "color": null,
+        "position": 0
+      },
+      {
+        "id": "198165001997910016",
+        "name": "Metanet Software",
+        "color": "#F1C40F",
+        "position": 55
+      },
+      {
+        "id": "198374136001593344",
+        "name": "Moderator",
+        "color": "#E67E22",
+        "position": 51
+      },
+      {
+        "id": "292469962440966144",
+        "name": "Helper",
+        "color": "#E91E63",
+        "position": 50
+      },
+      {
+        "id": "296190514468749312",
+        "name": "DRONE",
+        "color": "#206694",
+        "position": 26
+      },
+      {
+        "id": "307597836424314890",
+        "name": "Admin Mods",
+        "color": null,
+        "position": 54
+      },
+      {
+        "id": "365766408795193344",
+        "name": "Not Commander Salamander",
+        "color": null,
+        "position": 47
+      },
+      {
+        "id": "365999196622422017",
+        "name": "Probation",
+        "color": null,
+        "position": 44
+      },
+      {
+        "id": "369251926900211715",
+        "name": "DRONE COMMANDER",
+        "color": null,
+        "position": 46
+      },
+      {
+        "id": "371983346059968525",
+        "name": "Nv2",
+        "color": "#D7342A",
+        "position": 23
+      },
+      {
+        "id": "371983521868283904",
+        "name": "N1.4",
+        "color": "#277ECD",
+        "position": 24
+      },
+      {
+        "id": "371983547982020609",
+        "name": "N++",
+        "color": "#1ABC9C",
+        "position": 21
+      },
+      {
+        "id": "372009968049717249",
+        "name": "Nadeko",
+        "color": null,
+        "position": 52
+      },
+      {
+        "id": "372273266842271755",
+        "name": "N+",
+        "color": "#9B59B6",
+        "position": 22
+      },
+      {
+        "id": "372278497726693377",
+        "name": "Veteran",
+        "color": null,
+        "position": 20
+      },
+      {
+        "id": "372685315598712833",
+        "name": "con artist",
+        "color": null,
+        "position": 45
+      },
+      {
+        "id": "372695890521227264",
+        "name": "SuperVolcano",
+        "color": "#AE73FF",
+        "position": 43
+      },
+      {
+        "id": "374823503213494282",
+        "name": "Mole, they're bad at this game",
+        "color": "#BADA55",
+        "position": 42
+      },
+      {
+        "id": "374850770249449475",
+        "name": "HitFreezy",
+        "color": "#F19CBB",
+        "position": 41
+      },
+      {
+        "id": "388528151656923157",
+        "name": "Former Helpers",
+        "color": "#DA004E",
+        "position": 49
+      },
+      {
+        "id": "426999816896380938",
+        "name": "the worst person in canada",
+        "color": "#9B59B6",
+        "position": 19
+      },
+      {
+        "id": "456616166723420181",
+        "name": "Nv2 Grandmaster",
+        "color": "#FA4747",
+        "position": 33
+      },
+      {
+        "id": "456617669924356106",
+        "name": "N++ Grandmaster",
+        "color": "#17D377",
+        "position": 40
+      },
+      {
+        "id": "456646324847247360",
+        "name": "Former Nv2 Grandmaster",
+        "color": "#AA6D6D",
+        "position": 30
+      },
+      {
+        "id": "456646467579543562",
+        "name": "Former N++ Grandmaster",
+        "color": "#76A890",
+        "position": 31
+      },
+      {
+        "id": "456646735444574260",
+        "name": "Nv1.4 Grandmaster",
+        "color": "#7CBBE4",
+        "position": 34
+      },
+      {
+        "id": "456647062885498882",
+        "name": "Former Nv1.4 Grandmaster",
+        "color": "#6E88A7",
+        "position": 32
+      },
+      {
+        "id": "469345056462077952",
+        "name": "racer",
+        "color": null,
+        "position": 11
+      },
+      {
+        "id": "480463575018635294",
+        "name": "Steam",
+        "color": null,
+        "position": 17
+      },
+      {
+        "id": "480463630610071552",
+        "name": "PS4/PS5",
+        "color": null,
+        "position": 16
+      },
+      {
+        "id": "480463663912714240",
+        "name": "Xbox One/Xbox Series",
+        "color": null,
+        "position": 15
+      },
+      {
+        "id": "480463691326947329",
+        "name": "Switch",
+        "color": null,
+        "position": 14
+      },
+      {
+        "id": "532604629473820672",
+        "name": "applause director",
+        "color": null,
+        "position": 12
+      },
+      {
+        "id": "534312702496079881",
+        "name": "100%",
+        "color": "#79CBE3",
+        "position": 28
+      },
+      {
+        "id": "585564324634951704",
+        "name": "Nitro Booster",
+        "color": "#F47FFF",
+        "position": 25
+      },
+      {
+        "id": "632051576986664960",
+        "name": "Kartridge",
+        "color": null,
+        "position": 13
+      },
+      {
+        "id": "652032015658385428",
+        "name": "PS4 N++ Grandmaster",
+        "color": "#2ECC71",
+        "position": 39
+      },
+      {
+        "id": "673298705948082218",
+        "name": "Hardest Grandmaster",
+        "color": "#1F8B4C",
+        "position": 37
+      },
+      {
+        "id": "690623795303546900",
+        "name": "Playtester",
+        "color": null,
+        "position": 9
+      },
+      {
+        "id": "694603057970806896",
+        "name": "Reviewer",
+        "color": null,
+        "position": 8
+      },
+      {
+        "id": "753399997176873111",
+        "name": "co-op",
+        "color": null,
+        "position": 7
+      },
+      {
+        "id": "767138079727026178",
+        "name": "XB1 N++ Grandmaster",
+        "color": "#25C059",
+        "position": 38
+      },
+      {
+        "id": "811357022851301396",
+        "name": "she/her",
+        "color": null,
+        "position": 6
+      },
+      {
+        "id": "811357853536616479",
+        "name": "he/him",
+        "color": null,
+        "position": 5
+      },
+      {
+        "id": "811358028178915338",
+        "name": "they/them",
+        "color": null,
+        "position": 4
+      },
+      {
+        "id": "852408288879706122",
+        "name": "Voyeur",
+        "color": null,
+        "position": 10
+      },
+      {
+        "id": "942480563531550771",
+        "name": "Speedrun Grandmaster",
+        "color": "#1F8B4C",
+        "position": 36
+      },
+      {
+        "id": "942483228206456923",
+        "name": "Current/Past Grandmasters",
+        "color": null,
+        "position": 29
+      },
+      {
+        "id": "969078903547260988",
+        "name": "Hardcore Grandmaster",
+        "color": "#1F8B4C",
+        "position": 35
+      },
+      {
+        "id": "1010390714632372256",
+        "name": "sv's waifu",
+        "color": "#AE73FF",
+        "position": 18
+      },
+      {
+        "id": "1085414021580202076",
+        "name": "Userlevel Grandmaster",
+        "color": "#1F8B4C",
+        "position": 27
+      },
+      {
+        "id": "1104919320968036442",
+        "name": "200%",
+        "color": null,
+        "position": 3
+      },
+      {
+        "id": "1137794182761680966",
+        "name": "CTP",
+        "color": null,
+        "position": 2
+      },
+      {
+        "id": "1299110790824988783",
+        "name": "contest",
+        "color": null,
+        "position": 1
+      },
+      {
+        "id": "1441650463207325767",
+        "name": "Metanet Developer",
+        "color": "#F1C40F",
+        "position": 53
+      }
+    ]
+  },
+  "exportedAt": "2026-09-19T14:18:45.085884+02:00",
+  "members": [
+    {
+      "userId": "57595500404146176",
+      "nickname": null,
+      "displayName": "brue🔥",
+      "color": null,
+      "avatarUrl": null,
+      "bannerUrl": null,
+      "joinedAt": "2026-06-06T06:01:24.626+02:00",
+      "premiumSince": null,
+      "isPending": false,
+      "flags": [],
+      "roles": [],
+      "user": {
+        "id": "57595500404146176",
+        "name": "brueashear",
+        "discriminator": "0000",
+        "displayName": "brue🔥",
+        "isBot": false,
+        "avatarUrl": "https://cdn.discordapp.com/avatars/57595500404146176/562a155e32ac5bae4820b71205745134.png?size=512",
+        "bannerUrl": null
+      }
+    },
+    {
+      "userId": "59682232159186944",
+      "nickname": null,
+      "displayName": "90",
+      "color": "#1ABC9C",
+      "avatarUrl": null,
+      "bannerUrl": null,
+      "joinedAt": "2018-08-22T17:38:25.805+02:00",
+      "premiumSince": null,
+      "isPending": false,
+      "flags": [],
+      "roles": [
+        {
+          "id": "371983547982020609",
+          "name": "N++",
+          "color": "#1ABC9C",
+          "position": 21
+        },
+        {
+          "id": "480463575018635294",
+          "name": "Steam",
+          "color": null,
+          "position": 17
+        }
+      ],
+      "user": {
+        "id": "59682232159186944",
+        "name": "90",
+        "discriminator": "0000",
+        "displayName": "90",
+        "isBot": false,
+        "avatarUrl": "https://cdn.discordapp.com/avatars/59682232159186944/9bab3054eacab312871dc9eec2ddfd29.png?size=512",
+        "bannerUrl": null
+      }
+    },
+    {
+      "userId": "64572251525087232",
+      "nickname": null,
+      "displayName": "AND4H",
+      "color": null,
+      "avatarUrl": null,
+      "bannerUrl": null,
+      "joinedAt": "2018-09-29T20:39:40.334+02:00",
+      "premiumSince": null,
+      "isPending": false,
+      "flags": [
+        "DmSettingsUpsellAcknowledged"
+      ],
+      "roles": [],
+      "user": {
+        "id": "64572251525087232",
+        "name": "and4h",
+        "discriminator": "0000",
+        "displayName": "AND4H",
+        "isBot": false,
+        "avatarUrl": "https://cdn.discordapp.com/avatars/64572251525087232/a0e85b9006825e895c5b1c3ef9acbead.png?size=512",
+        "bannerUrl": null
+      }
+    },
+    {
+      "userId": "66135744967610368",
+      "nickname": null,
+      "displayName": "pill",
+      "color": "#1ABC9C",
+      "avatarUrl": null,
+      "bannerUrl": null,
+      "joinedAt": "2020-03-23T13:13:28.875+01:00",
+      "premiumSince": null,
+      "isPending": false,
+      "flags": [],
+      "roles": [
+        {
+          "id": "371983547982020609",
+          "name": "N++",
+          "color": "#1ABC9C",
+          "position": 21
+        },
+        {
+          "id": "480463575018635294",
+          "name": "Steam",
+          "color": null,
+          "position": 17
+        }
+      ],
+      "user": {
+        "id": "66135744967610368",
+        "name": "pill",
+        "discriminator": "0000",
+        "displayName": "pill",
+        "isBot": false,
+        "avatarUrl": "https://cdn.discordapp.com/avatars/66135744967610368/04e1788fa63db81d6d03b09725a0b5e5.png?size=512",
+        "bannerUrl": null
+      }
+    },
+    {
+      "userId": "66155023779758080",
+      "nickname": "trackpadtimmy",
+      "displayName": "trackpadtimmy",
+      "color": "#D7342A",
+      "avatarUrl": null,
+      "bannerUrl": null,
+      "joinedAt": "2017-10-19T04:11:02.439+02:00",
+      "premiumSince": null,
+      "isPending": false,
+      "flags": [],
+      "roles": [
+        {
+          "id": "371983346059968525",
+          "name": "Nv2",
+          "color": "#D7342A",
+          "position": 23
+        },
+        {
+          "id": "371983547982020609",
+          "name": "N++",
+          "color": "#1ABC9C",
+          "position": 21
+        }
+      ],
+      "user": {
+        "id": "66155023779758080",
+        "name": "m.tthew",
+        "discriminator": "0000",
+        "displayName": "matthew",
+        "isBot": false,
+        "avatarUrl": "https://cdn.discordapp.com/avatars/66155023779758080/a826f79bd3f96728d29bc8bca5d6bdd7.png?size=512",
+        "bannerUrl": null
+      }
+    },
+    {
+      "userId": "66185972093550592",
+      "nickname": null,
+      "displayName": "liong felix",
+      "color": null,
+      "avatarUrl": null,
+      "bannerUrl": null,
+      "joinedAt": "2022-01-19T02:07:53.956+01:00",
+      "premiumSince": null,
+      "isPending": false,
+      "flags": [],
+      "roles": [],
+      "user": {
+        "id": "66185972093550592",
+        "name": "liongfelix2073",
+        "discriminator": "0000",
+        "displayName": "liong felix",
+        "isBot": false,
+        "avatarUrl": "https://cdn.discordapp.com/avatars/66185972093550592/f1603ca9f4ec64757c18ef74dd078ec0.png?size=512",
+        "bannerUrl": null
+      }
+    },
+    {
+      "userId": "66609022161133568",
+      "nickname": null,
+      "displayName": "DukeTwo-Can",
+      "color": null,
+      "avatarUrl": null,
+      "bannerUrl": null,
+      "joinedAt": "2025-12-05T21:35:01.172+01:00",
+      "premiumSince": null,
+      "isPending": false,
+      "flags": [],
+      "roles": [],
+      "user": {
+        "id": "66609022161133568",
+        "name": "duketwocan",
+        "discriminator": "0000",
+        "displayName": "DukeTwo-Can",
+        "isBot": false,
+        "avatarUrl": "https://cdn.discordapp.com/avatars/66609022161133568/e8da81c2ddf0dde5b6e941937baad8bf.png?size=512",
+        "bannerUrl": null
+      }
+    },
+    {
+      "userId": "68687737313562624",
+      "nickname": null,
+      "displayName": "CubeSoldier",
+      "color": null,
+      "avatarUrl": null,
+      "bannerUrl": null,
+      "joinedAt": "2026-06-08T01:57:49.487+02:00",
+      "premiumSince": null,
+      "isPending": false,
+      "flags": [],
+      "roles": [],
+      "user": {
+        "id": "68687737313562624",
+        "name": "cubesoldier",
+        "discriminator": "0000",
+        "displayName": "CubeSoldier",
+        "isBot": false,
+        "avatarUrl": "https://cdn.discordapp.com/avatars/68687737313562624/8902ec49ed0ae48edb3bb45070d42bfc.png?size=512",
+        "bannerUrl": null
+      }
+    },
+    {
+      "userId": "68902867200651264",
+      "nickname": null,
+      "displayName": "ugoboom",
+      "color": null,
+      "avatarUrl": null,
+      "bannerUrl": null,
+      "joinedAt": "2021-04-02T23:30:08.801+02:00",
+      "premiumSince": null,
+      "isPending": false,
+      "flags": [],
+      "roles": [],
+      "user": {
+        "id": "68902867200651264",
+        "name": "ugoboom",
+        "discriminator": "0000",
+        "displayName": "ugoboom",
+        "isBot": false,
+        "avatarUrl": "https://cdn.discordapp.com/avatars/68902867200651264/ef77efe6537fdc1203beb9b542353694.png?size=512",
+        "bannerUrl": null
+      }
+    },
+    {
+      "userId": "70738708503986176",
+      "nickname": null,
+      "displayName": "Argo",
+      "color": null,
+      "avatarUrl": null,
+      "bannerUrl": null,
+      "joinedAt": "2026-06-07T03:43:15.369+02:00",
+      "premiumSince": null,
+      "isPending": false,
+      "flags": [],
+      "roles": [],
+      "user": {
+        "id": "70738708503986176",
+        "name": "argo",
+        "discriminator": "0000",
+        "displayName": "Argo",
+        "isBot": false,
+        "avatarUrl": "https://cdn.discordapp.com/avatars/70738708503986176/3a9c0f8bd6cd10b066b74bfb284c3e7a.png?size=512",
+        "bannerUrl": null
+      }
+    },
+    {
+      "userId": "72040252742565888",
+      "nickname": null,
+      "displayName": "Mr. Walkway",
+      "color": null,
+      "avatarUrl": null,
+      "bannerUrl": null,
+      "joinedAt": "2016-08-11T19:12:39.194+02:00",
+      "premiumSince": null,
+      "isPending": false,
+      "flags": [],
+      "roles": [],
+      "user": {
+        "id": "72040252742565888",
+        "name": "mr.walkway",
+        "discriminator": "0000",
+        "displayName": "Mr. Walkway",
+        "isBot": false,
+        "avatarUrl": "https://cdn.discordapp.com/avatars/72040252742565888/222257bb1133e7d0ebcb9bbe8b450819.png?size=512",
+        "bannerUrl": null
+      }
+    },
+    {
+      "userId": "73126988126101504",
+      "nickname": null,
+      "displayName": "Aria",
+      "color": null,
+      "avatarUrl": null,
+      "bannerUrl": null,
+      "joinedAt": "2022-05-12T17:10:21.358+02:00",
+      "premiumSince": null,
+      "isPending": false,
+      "flags": [],
+      "roles": [],
+      "user": {
+        "id": "73126988126101504",
+        "name": "horga",
+        "discriminator": "0000",
+        "displayName": "Aria",
+        "isBot": false,
+        "avatarUrl": "https://cdn.discordapp.com/avatars/73126988126101504/b73ab2a0bf645bbcce8258ff5c2f4da0.png?size=512",
+        "bannerUrl": null
+      }
+    },
+    {
+      "userId": "74698770951966720",
+      "nickname": "Potlato",
+      "displayName": "Potlato",
+      "color": "#D7342A",
+      "avatarUrl": null,
+      "bannerUrl": null,
+      "joinedAt": "2020-09-12T08:02:02.994+02:00",
+      "premiumSince": null,
+      "isPending": false,
+      "flags": [],
+      "roles": [
+        {
+          "id": "371983346059968525",
+          "name": "Nv2",
+          "color": "#D7342A",
+          "position": 23
+        }
+      ],
+      "user": {
+        "id": "74698770951966720",
+        "name": "potlato",
+        "discriminator": "0000",
+        "displayName": "Potlato",
+        "isBot": false,
+        "avatarUrl": "https://cdn.discordapp.com/avatars/74698770951966720/f5c320732d02c3d169207b52ffe73c71.png?size=512",
+        "bannerUrl": null
+      }
+    },
+    {
+      "userId": "75418016807923712",
+      "nickname": null,
+      "displayName": "Amzi Jeffs",
+      "color": null,
+      "avatarUrl": null,
+      "bannerUrl": null,
+      "joinedAt": "2020-11-14T04:42:59.31+01:00",
+      "premiumSince": null,
+      "isPending": false,
+      "flags": [],
+      "roles": [],
+      "user": {
+        "id": "75418016807923712",
+        "name": "yeti5916",
+        "discriminator": "0000",
+        "displayName": "Amzi Jeffs",
+        "isBot": false,
+        "avatarUrl": "https://cdn.discordapp.com/avatars/75418016807923712/2d608e28e9f7d105334a73b719a7039f.png?size=512",
+        "bannerUrl": null
+      }
+    },
+    {
+      "userId": "77208413100052480",
+      "nickname": null,
+      "displayName": "CalamityShreds",
+      "color": null,
+      "avatarUrl": null,
+      "bannerUrl": null,
+      "joinedAt": "2026-06-06T01:55:21.385+02:00",
+      "premiumSince": null,
+      "isPending": false,
+      "flags": [],
+      "roles": [],
+      "user": {
+        "id": "77208413100052480",
+        "name": "calamityshreds",
+        "discriminator": "0000",
+        "displayName": "CalamityShreds",
+        "isBot": false,
+        "avatarUrl": "https://cdn.discordapp.com/avatars/77208413100052480/3fde46fdcdbfa19a24b40b2e893651eb.png?size=512",
+        "bannerUrl": null
+      }
+    },
+    {
+      "userId": "79713699773808640",
+      "nickname": null,
+      "displayName": "towwl",
+      "color": null,
+      "avatarUrl": null,
+      "bannerUrl": null,
+      "joinedAt": "2017-06-30T18:56:51.067+02:00",
+      "premiumSince": null,
+      "isPending": false,
+      "flags": [],
+      "roles": [],
+      "user": {
+        "id": "79713699773808640",
+        "name": "towwl8539",
+        "discriminator": "0000",
+        "displayName": "towwl",
+        "isBot": false,
+        "avatarUrl": "https://cdn.discordapp.com/avatars/79713699773808640/5ab99ee597946f41da0168fdc81d7101.png?size=512",
+        "bannerUrl": null
+      }
+    },
+    {
+      "userId": "80521685014425600",
+      "nickname": null,
+      "displayName": "corpus",
+      "color": null,
+      "avatarUrl": null,
+      "bannerUrl": null,
+      "joinedAt": "2025-10-12T14:26:19.277+02:00",
+      "premiumSince": null,
+      "isPending": false,
+      "flags": [],
+      "roles": [],
+      "user": {
+        "id": "80521685014425600",
+        "name": "corpus",
+        "discriminator": "0000",
+        "displayName": "corpus",
+        "isBot": false,
+        "avatarUrl": "https://cdn.discordapp.com/avatars/80521685014425600/2a34b3249d2ef9a10c48487cc8868d61.png?size=512",
+        "bannerUrl": null
+      }
+    },
+    {
+      "userId": "80762950834458624",
+      "nickname": null,
+      "displayName": "Pull",
+      "color": null,
+      "avatarUrl": null,
+      "bannerUrl": null,
+      "joinedAt": "2016-12-31T18:32:09.104+01:00",
+      "premiumSince": null,
+      "isPending": false,
+      "flags": [],
+      "roles": [],
+      "user": {
+        "id": "80762950834458624",
+        "name": "pull",
+        "discriminator": "0000",
+        "displayName": "Pull",
+        "isBot": false,
+        "avatarUrl": "https://cdn.discordapp.com/avatars/80762950834458624/4bd56395f24f9f1c9320e48a74a613a4.png?size=512",
+        "bannerUrl": null
+      }
+    },
+    {
+      "userId": "80809083938013184",
+      "nickname": null,
+      "displayName": "Carson",
+      "color": null,
+      "avatarUrl": null,
+      "bannerUrl": null,
+      "joinedAt": "2020-03-07T23:04:41.905+01:00",
+      "premiumSince": null,
+      "isPending": false,
+      "flags": [],
+      "roles": [],
+      "user": {
+        "id": "80809083938013184",
+        "name": "carson",
+        "discriminator": "0000",
+        "displayName": "Carson",
+        "isBot": false,
+        "avatarUrl": "https://cdn.discordapp.com/avatars/80809083938013184/3255baa49f9e4de158513dbf04bb21f1.png?size=512",
+        "bannerUrl": null
+      }
+    },
+    {
+      "userId": "80909773905604608",
+      "nickname": null,
+      "displayName": "Freyaday",
+      "color": null,
+      "avatarUrl": null,
+      "bannerUrl": null,
+      "joinedAt": "2016-09-23T09:29:18.904+02:00",
+      "premiumSince": null,
+      "isPending": false,
+      "flags": [],
+      "roles": [],
+      "user": {
+        "id": "80909773905604608",
+        "name": "freyaday",
+        "discriminator": "0000",
+        "displayName": "Freyaday",
+        "isBot": false,
+        "avatarUrl": "https://cdn.discordapp.com/avatars/80909773905604608/a05198bd516fdb9605b0af42df65f7f1.png?size=512",
+        "bannerUrl": null
+      }
+    },
+    {
+      "userId": "86453704420515840",
+      "nickname": null,
+      "displayName": "Schmole",
+      "color": "#79CBE3",
+      "avatarUrl": null,
+      "bannerUrl": null,
+      "joinedAt": "2024-01-06T03:25:13.957+01:00",
+      "premiumSince": null,
+      "isPending": false,
+      "flags": [],
+      "roles": [
+        {
+          "id": "534312702496079881",
+          "name": "100%",
+          "color": "#79CBE3",
+          "position": 28
+        }
+      ],
+      "user": {
+        "id": "86453704420515840",
+        "name": "schmole",
+        "discriminator": "0000",
+        "displayName": "Schmole",
+        "isBot": false,
+        "avatarUrl": "https://cdn.discordapp.com/avatars/86453704420515840/4763638d691f2dd6cf33ac696f1f72e8.png?size=512",
+        "bannerUrl": null
+      }
+    },
+    {
+      "userId": "142458564835803137",
+      "nickname": null,
+      "displayName": "Emmoji",
+      "color": "#F47FFF",
+      "avatarUrl": null,
+      "bannerUrl": null,
+      "joinedAt": "2026-01-23T03:32:23.24+01:00",
+      "premiumSince": "2020-07-16T19:17:21.138+02:00",
+      "isPending": false,
+      "flags": [],
+      "roles": [
+        {
+          "id": "585564324634951704",
+          "name": "Nitro Booster",
+          "color": "#F47FFF",
+          "position": 25
+        }
+      ],
+      "user": {
+        "id": "142458564835803137",
+        "name": "emmoji",
+        "discriminator": "0000",
+        "displayName": "Emmoji",
+        "isBot": false,
+        "avatarUrl": "https://cdn.discordapp.com/avatars/142458564835803137/8df9d9907dbb83f4d68ac5b251faa719.png?size=512",
+        "bannerUrl": null
+      }
+    },
+    {
+      "userId": "156995792220061696",
+      "nickname": "Skylighter [AD]",
+      "displayName": "Skylighter [AD]",
+      "color": "#79CBE3",
+      "avatarUrl": null,
+      "bannerUrl": null,
+      "joinedAt": "2018-02-02T13:00:36.04+01:00",
+      "premiumSince": "2026-04-28T06:19:57.05+02:00",
+      "isPending": false,
+      "flags": [],
+      "roles": [
+        {
+          "id": "942483228206456923",
+          "name": "Current/Past Grandmasters",
+          "color": null,
+          "position": 29
+        },
+        {
+          "id": "534312702496079881",
+          "name": "100%",
+          "color": "#79CBE3",
+          "position": 28
+        },
+        {
+          "id": "585564324634951704",
+          "name": "Nitro Booster",
+          "color": "#F47FFF",
+          "position": 25
+        },
+        {
+          "id": "371983547982020609",
+          "name": "N++",
+          "color": "#1ABC9C",
+          "position": 21
+        },
+        {
+          "id": "480463575018635294",
+          "name": "Steam",
+          "color": null,
+          "position": 17
+        },
+        {
+          "id": "480463630610071552",
+          "name": "PS4/PS5",
+          "color": null,
+          "position": 16
+        },
+        {
+          "id": "469345056462077952",
+          "name": "racer",
+          "color": null,
+          "position": 11
+        },
+        {
+          "id": "694603057970806896",
+          "name": "Reviewer",
+          "color": null,
+          "position": 8
+        },
+        {
+          "id": "811357853536616479",
+          "name": "he/him",
+          "color": null,
+          "position": 5
+        },
+        {
+          "id": "1299110790824988783",
+          "name": "contest",
+          "color": null,
+          "position": 1
+        }
+      ],
+      "user": {
+        "id": "156995792220061696",
+        "name": "skylighter",
+        "discriminator": "0000",
+        "displayName": "Skylighter",
+        "isBot": false,
+        "avatarUrl": "https://cdn.discordapp.com/avatars/156995792220061696/52dc611d5c44ce89fa02b62a6f73b998.png?size=512",
+        "bannerUrl": null
+      }
+    },
+    {
+      "userId": "157303451578138625",
+      "nickname": null,
+      "displayName": "ekisacik",
+      "color": "#79CBE3",
+      "avatarUrl": null,
+      "bannerUrl": null,
+      "joinedAt": "2020-04-18T23:18:23.578+02:00",
+      "premiumSince": null,
+      "isPending": false,
+      "flags": [],
+      "roles": [
+        {
+          "id": "534312702496079881",
+          "name": "100%",
+          "color": "#79CBE3",
+          "position": 28
+        },
+        {
+          "id": "371983521868283904",
+          "name": "N1.4",
+          "color": "#277ECD",
+          "position": 24
+        },
+        {
+          "id": "371983346059968525",
+          "name": "Nv2",
+          "color": "#D7342A",
+          "position": 23
+        },
+        {
+          "id": "371983547982020609",
+          "name": "N++",
+          "color": "#1ABC9C",
+          "position": 21
+        },
+        {
+          "id": "480463575018635294",
+          "name": "Steam",
+          "color": null,
+          "position": 17
+        },
+        {
+          "id": "469345056462077952",
+          "name": "racer",
+          "color": null,
+          "position": 11
+        }
+      ],
+      "user": {
+        "id": "157303451578138625",
+        "name": "ekisacik",
+        "discriminator": "0000",
+        "displayName": "ekisacik",
+        "isBot": false,
+        "avatarUrl": "https://cdn.discordapp.com/avatars/157303451578138625/59fa5933b2b2fe94e093bacd7287cb07.png?size=512",
+        "bannerUrl": null
+      }
+    },
+    {
+      "userId": "162802015351603200",
+      "nickname": null,
+      "displayName": "TheGreatNoodles",
+      "color": null,
+      "avatarUrl": null,
+      "bannerUrl": null,
+      "joinedAt": "2024-12-29T11:52:10.565+01:00",
+      "premiumSince": null,
+      "isPending": false,
+      "flags": [],
+      "roles": [],
+      "user": {
+        "id": "162802015351603200",
+        "name": "thegreatnoodles",
+        "discriminator": "0000",
+        "displayName": "TheGreatNoodles",
+        "isBot": false,
+        "avatarUrl": "https://cdn.discordapp.com/avatars/162802015351603200/ab64e2d5b03db840581ce03a3e966518.png?size=512",
+        "bannerUrl": null
+      }
+    },
+    {
+      "userId": "173613438650679296",
+      "nickname": null,
+      "displayName": "koolboom",
+      "color": "#79CBE3",
+      "avatarUrl": null,
+      "bannerUrl": null,
+      "joinedAt": "2022-06-06T02:03:22.444+02:00",
+      "premiumSince": null,
+      "isPending": false,
+      "flags": [],
+      "roles": [
+        {
+          "id": "534312702496079881",
+          "name": "100%",
+          "color": "#79CBE3",
+          "position": 28
+        }
+      ],
+      "user": {
+        "id": "173613438650679296",
+        "name": "koolboom",
+        "discriminator": "0000",
+        "displayName": "koolboom",
+        "isBot": false,
+        "avatarUrl": "https://cdn.discordapp.com/avatars/173613438650679296/5f6f6dd8bc1bfa88700654ca258344d6.png?size=512",
+        "bannerUrl": null
+      }
+    },
+    {
+      "userId": "187379266256633867",
+      "nickname": "SV",
+      "displayName": "SV",
+      "color": "#AE73FF",
+      "avatarUrl": null,
+      "bannerUrl": null,
+      "joinedAt": "2017-01-07T12:04:50.384+01:00",
+      "premiumSince": null,
+      "isPending": false,
+      "flags": [],
+      "roles": [
+        {
+          "id": "372695890521227264",
+          "name": "SuperVolcano",
+          "color": "#AE73FF",
+          "position": 43
+        },
+        {
+          "id": "371983547982020609",
+          "name": "N++",
+          "color": "#1ABC9C",
+          "position": 21
+        }
+      ],
+      "user": {
+        "id": "187379266256633867",
+        "name": "supervolcano",
+        "discriminator": "0000",
+        "displayName": "SV",
+        "isBot": false,
+        "avatarUrl": "https://cdn.discordapp.com/avatars/187379266256633867/734f577f101742cf4d8c96b40c6d7ba4.png?size=512",
+        "bannerUrl": null
+      }
+    },
+    {
+      "userId": "188790334694621185",
+      "nickname": null,
+      "displayName": "Zelaird Gervik",
+      "color": null,
+      "avatarUrl": null,
+      "bannerUrl": null,
+      "joinedAt": "2024-12-26T05:58:27.186+01:00",
+      "premiumSince": null,
+      "isPending": false,
+      "flags": [],
+      "roles": [],
+      "user": {
+        "id": "188790334694621185",
+        "name": "hecatonicosachoron",
+        "discriminator": "0000",
+        "displayName": "Zelaird Gervik",
+        "isBot": false,
+        "avatarUrl": "https://cdn.discordapp.com/avatars/188790334694621185/8750aff59715fafb51e32749a0616fc9.png?size=512",
+        "bannerUrl": null
+      }
+    },
+    {
+      "userId": "198240235002396674",
+      "nickname": "golfkid",
+      "displayName": "golfkid",
+      "color": "#E67E22",
+      "avatarUrl": null,
+      "bannerUrl": null,
+      "joinedAt": "2016-08-06T02:44:56.792+02:00",
+      "premiumSince": null,
+      "isPending": false,
+      "flags": [],
+      "roles": [
+        {
+          "id": "307597836424314890",
+          "name": "Admin Mods",
+          "color": null,
+          "position": 54
+        },
+        {
+          "id": "198374136001593344",
+          "name": "Moderator",
+          "color": "#E67E22",
+          "position": 51
+        },
+        {
+          "id": "372685315598712833",
+          "name": "con artist",
+          "color": null,
+          "position": 45
+        },
+        {
+          "id": "371983547982020609",
+          "name": "N++",
+          "color": "#1ABC9C",
+          "position": 21
+        },
+        {
+          "id": "480463575018635294",
+          "name": "Steam",
+          "color": null,
+          "position": 17
+        }
+      ],
+      "user": {
+        "id": "198240235002396674",
+        "name": "golfkid",
+        "discriminator": "0000",
+        "displayName": "golfkid",
+        "isBot": false,
+        "avatarUrl": "https://cdn.discordapp.com/avatars/198240235002396674/c6e861cf577d0745de0c02babfac0356.png?size=512",
+        "bannerUrl": null
+      }
+    },
+    {
+      "userId": "198539306854383616",
+      "nickname": null,
+      "displayName": "Ephemeral",
+      "color": "#79CBE3",
+      "avatarUrl": null,
+      "bannerUrl": null,
+      "joinedAt": "2021-07-17T17:30:10.81+02:00",
+      "premiumSince": null,
+      "isPending": false,
+      "flags": [],
+      "roles": [
+        {
+          "id": "534312702496079881",
+          "name": "100%",
+          "color": "#79CBE3",
+          "position": 28
+        }
+      ],
+      "user": {
+        "id": "198539306854383616",
+        "name": "ephemeralxxv",
+        "discriminator": "0000",
+        "displayName": "Ephemeral",
+        "isBot": false,
+        "avatarUrl": "https://cdn.discordapp.com/avatars/198539306854383616/71a4f40008fd32963e44f29166ac680a.png?size=512",
+        "bannerUrl": null
+      }
+    },
+    {
+      "userId": "200775143860076545",
+      "nickname": null,
+      "displayName": "raigan#7701",
+      "color": "#F1C40F",
+      "avatarUrl": null,
+      "bannerUrl": null,
+      "joinedAt": "2016-07-08T02:48:44.581+02:00",
+      "premiumSince": null,
+      "isPending": false,
+      "flags": [],
+      "roles": [
+        {
+          "id": "198165001997910016",
+          "name": "Metanet Software",
+          "color": "#F1C40F",
+          "position": 55
+        }
+      ],
+      "user": {
+        "id": "200775143860076545",
+        "name": "raigan_7701",
+        "discriminator": "0000",
+        "displayName": "raigan#7701",
+        "isBot": false,
+        "avatarUrl": "https://cdn.discordapp.com/avatars/200775143860076545/1220cc3e207cff14cf0646260519740f.png?size=512",
+        "bannerUrl": null
+      }
+    },
+    {
+      "userId": "203540032739344384",
+      "nickname": null,
+      "displayName": "nexter",
+      "color": "#E67E22",
+      "avatarUrl": null,
+      "bannerUrl": null,
+      "joinedAt": "2022-09-02T17:56:12.162+02:00",
+      "premiumSince": null,
+      "isPending": false,
+      "flags": [],
+      "roles": [
+        {
+          "id": "198374136001593344",
+          "name": "Moderator",
+          "color": "#E67E22",
+          "position": 51
+        },
+        {
+          "id": "371983547982020609",
+          "name": "N++",
+          "color": "#1ABC9C",
+          "position": 21
+        },
+        {
+          "id": "480463575018635294",
+          "name": "Steam",
+          "color": null,
+          "position": 17
+        },
+        {
+          "id": "811357853536616479",
+          "name": "he/him",
+          "color": null,
+          "position": 5
+        }
+      ],
+      "user": {
+        "id": "203540032739344384",
+        "name": "nnexterr",
+        "discriminator": "0000",
+        "displayName": "nexter",
+        "isBot": false,
+        "avatarUrl": "https://cdn.discordapp.com/avatars/203540032739344384/a8fbda683d1226d373b7fd6f4a7d7dd3.png?size=512",
+        "bannerUrl": null
+      }
+    },
+    {
+      "userId": "204332624288677890",
+      "nickname": null,
+      "displayName": "Eddy",
+      "color": "#17D377",
+      "avatarUrl": null,
+      "bannerUrl": null,
+      "joinedAt": "2016-07-17T22:25:42.694+02:00",
+      "premiumSince": null,
+      "isPending": false,
+      "flags": [],
+      "roles": [
+        {
+          "id": "456617669924356106",
+          "name": "N++ Grandmaster",
+          "color": "#17D377",
+          "position": 40
+        },
+        {
+          "id": "456646735444574260",
+          "name": "Nv1.4 Grandmaster",
+          "color": "#7CBBE4",
+          "position": 34
+        },
+        {
+          "id": "456646324847247360",
+          "name": "Former Nv2 Grandmaster",
+          "color": "#AA6D6D",
+          "position": 30
+        },
+        {
+          "id": "942483228206456923",
+          "name": "Current/Past Grandmasters",
+          "color": null,
+          "position": 29
+        },
+        {
+          "id": "1137794182761680966",
+          "name": "CTP",
+          "color": null,
+          "position": 2
+        }
+      ],
+      "user": {
+        "id": "204332624288677890",
+        "name": "eddymatagallos",
+        "discriminator": "0000",
+        "displayName": "Eddy",
+        "isBot": false,
+        "avatarUrl": "https://cdn.discordapp.com/avatars/204332624288677890/55f560727d5ab6a7267c5e96bcc1214f.png?size=512",
+        "bannerUrl": null
+      }
+    },
+    {
+      "userId": "235992850637127681",
+      "nickname": null,
+      "displayName": "Commander Coriander Salamander",
+      "color": "#DA004E",
+      "avatarUrl": null,
+      "bannerUrl": null,
+      "joinedAt": "2016-11-24T20:28:09.774+01:00",
+      "premiumSince": null,
+      "isPending": false,
+      "flags": [],
+      "roles": [
+        {
+          "id": "388528151656923157",
+          "name": "Former Helpers",
+          "color": "#DA004E",
+          "position": 49
+        },
+        {
+          "id": "371983521868283904",
+          "name": "N1.4",
+          "color": "#277ECD",
+          "position": 24
+        },
+        {
+          "id": "426999816896380938",
+          "name": "the worst person in canada",
+          "color": "#9B59B6",
+          "position": 19
+        }
+      ],
+      "user": {
+        "id": "235992850637127681",
+        "name": "commandercoriandersalamander",
+        "discriminator": "0000",
+        "displayName": "Commander Coriander Salamander",
+        "isBot": false,
+        "avatarUrl": "https://cdn.discordapp.com/avatars/235992850637127681/53858ab682bd9b168bbd4309761668e2.png?size=512",
+        "bannerUrl": null
+      }
+    },
+    {
+      "userId": "252347045266980864",
+      "nickname": "anthonyiye plus infinity times 2",
+      "displayName": "anthonyiye plus infinity times 2",
+      "color": null,
+      "avatarUrl": null,
+      "bannerUrl": null,
+      "joinedAt": "2021-04-04T09:07:53.397+02:00",
+      "premiumSince": null,
+      "isPending": false,
+      "flags": [],
+      "roles": [],
+      "user": {
+        "id": "252347045266980864",
+        "name": "anthonyiye",
+        "discriminator": "0000",
+        "displayName": "Antonio",
+        "isBot": false,
+        "avatarUrl": "https://cdn.discordapp.com/avatars/252347045266980864/49ada1c17449199224aa48ea7ed9a204.png?size=512",
+        "bannerUrl": null
+      }
+    },
+    {
+      "userId": "266629666331164673",
+      "nickname": "Untamed Nim",
+      "displayName": "Untamed Nim",
+      "color": "#DA004E",
+      "avatarUrl": null,
+      "bannerUrl": null,
+      "joinedAt": "2017-01-05T19:11:18.706+01:00",
+      "premiumSince": null,
+      "isPending": false,
+      "flags": [],
+      "roles": [
+        {
+          "id": "388528151656923157",
+          "name": "Former Helpers",
+          "color": "#DA004E",
+          "position": 49
+        },
+        {
+          "id": "371983547982020609",
+          "name": "N++",
+          "color": "#1ABC9C",
+          "position": 21
+        },
+        {
+          "id": "480463575018635294",
+          "name": "Steam",
+          "color": null,
+          "position": 17
+        },
+        {
+          "id": "480463630610071552",
+          "name": "PS4/PS5",
+          "color": null,
+          "position": 16
+        },
+        {
+          "id": "632051576986664960",
+          "name": "Kartridge",
+          "color": null,
+          "position": 13
+        },
+        {
+          "id": "811357853536616479",
+          "name": "he/him",
+          "color": null,
+          "position": 5
+        }
+      ],
+      "user": {
+        "id": "266629666331164673",
+        "name": "untamednim",
+        "discriminator": "0000",
+        "displayName": "Untamed Nim",
+        "isBot": false,
+        "avatarUrl": "https://cdn.discordapp.com/avatars/266629666331164673/cbe6ed56dcbcf1941b523cf2d8c18bd7.png?size=512",
+        "bannerUrl": null
+      }
+    },
+    {
+      "userId": "277802418950111232",
+      "nickname": null,
+      "displayName": "TheBeastlyPork",
+      "color": null,
+      "avatarUrl": null,
+      "bannerUrl": null,
+      "joinedAt": "2024-11-14T03:06:49.397+01:00",
+      "premiumSince": null,
+      "isPending": false,
+      "flags": [],
+      "roles": [],
+      "user": {
+        "id": "277802418950111232",
+        "name": "thebeastlypork",
+        "discriminator": "0000",
+        "displayName": "TheBeastlyPork",
+        "isBot": false,
+        "avatarUrl": "https://cdn.discordapp.com/avatars/277802418950111232/dc0b41f77b8f4e98cab4c4450d8a5dc7.png?size=512",
+        "bannerUrl": null
+      }
+    },
+    {
+      "userId": "290946615290626048",
+      "nickname": null,
+      "displayName": "abho",
+      "color": "#79CBE3",
+      "avatarUrl": null,
+      "bannerUrl": null,
+      "joinedAt": "2017-09-29T21:12:08.182+02:00",
+      "premiumSince": null,
+      "isPending": false,
+      "flags": [],
+      "roles": [
+        {
+          "id": "534312702496079881",
+          "name": "100%",
+          "color": "#79CBE3",
+          "position": 28
+        },
+        {
+          "id": "371983547982020609",
+          "name": "N++",
+          "color": "#1ABC9C",
+          "position": 21
+        },
+        {
+          "id": "480463575018635294",
+          "name": "Steam",
+          "color": null,
+          "position": 17
+        },
+        {
+          "id": "480463630610071552",
+          "name": "PS4/PS5",
+          "color": null,
+          "position": 16
+        },
+        {
+          "id": "480463691326947329",
+          "name": "Switch",
+          "color": null,
+          "position": 14
+        },
+        {
+          "id": "811357853536616479",
+          "name": "he/him",
+          "color": null,
+          "position": 5
+        }
+      ],
+      "user": {
+        "id": "290946615290626048",
+        "name": "aabho",
+        "discriminator": "0000",
+        "displayName": "abho",
+        "isBot": false,
+        "avatarUrl": "https://cdn.discordapp.com/avatars/290946615290626048/b5c2a7552e5a896f22e8dd6514ce2907.png?size=512",
+        "bannerUrl": null
+      }
+    },
+    {
+      "userId": "295190059588648961",
+      "nickname": null,
+      "displayName": "SU56/双六",
+      "color": "#79CBE3",
+      "avatarUrl": null,
+      "bannerUrl": null,
+      "joinedAt": "2023-04-06T10:23:01.162+02:00",
+      "premiumSince": null,
+      "isPending": false,
+      "flags": [],
+      "roles": [
+        {
+          "id": "534312702496079881",
+          "name": "100%",
+          "color": "#79CBE3",
+          "position": 28
+        }
+      ],
+      "user": {
+        "id": "295190059588648961",
+        "name": "su56",
+        "discriminator": "0000",
+        "displayName": "SU56/双六",
+        "isBot": false,
+        "avatarUrl": "https://cdn.discordapp.com/avatars/295190059588648961/5d3f2cd858458836c0e18464a5b73201.png?size=512",
+        "bannerUrl": null
+      }
+    },
+    {
+      "userId": "322144448312246272",
+      "nickname": null,
+      "displayName": "Johnes",
+      "color": "#1ABC9C",
+      "avatarUrl": null,
+      "bannerUrl": null,
+      "joinedAt": "2023-11-20T06:05:03.585+01:00",
+      "premiumSince": null,
+      "isPending": false,
+      "flags": [],
+      "roles": [
+        {
+          "id": "371983547982020609",
+          "name": "N++",
+          "color": "#1ABC9C",
+          "position": 21
+        }
+      ],
+      "user": {
+        "id": "322144448312246272",
+        "name": "johnes",
+        "discriminator": "0000",
+        "displayName": "Johnes",
+        "isBot": false,
+        "avatarUrl": "https://cdn.discordapp.com/avatars/322144448312246272/f364e2c73dc471b68d410fb7c743911f.png?size=512",
+        "bannerUrl": null
+      }
+    },
+    {
+      "userId": "380876009987375104",
+      "nickname": null,
+      "displayName": "tetra",
+      "color": null,
+      "avatarUrl": null,
+      "bannerUrl": null,
+      "joinedAt": "2024-12-12T18:46:59.603+01:00",
+      "premiumSince": null,
+      "isPending": false,
+      "flags": [],
+      "roles": [],
+      "user": {
+        "id": "380876009987375104",
+        "name": "tetramputechture",
+        "discriminator": "0000",
+        "displayName": "tetra",
+        "isBot": false,
+        "avatarUrl": "https://cdn.discordapp.com/avatars/380876009987375104/2a634dc17484053c5a6a64303b5f5736.png?size=512",
+        "bannerUrl": null
+      }
+    },
+    {
+      "userId": "443045945643368452",
+      "nickname": null,
+      "displayName": "Surt",
+      "color": "#1ABC9C",
+      "avatarUrl": null,
+      "bannerUrl": null,
+      "joinedAt": "2023-11-24T23:17:08.999+01:00",
+      "premiumSince": null,
+      "isPending": false,
+      "flags": [],
+      "roles": [
+        {
+          "id": "371983547982020609",
+          "name": "N++",
+          "color": "#1ABC9C",
+          "position": 21
+        }
+      ],
+      "user": {
+        "id": "443045945643368452",
+        "name": "surtgd",
+        "discriminator": "0000",
+        "displayName": "Surt",
+        "isBot": false,
+        "avatarUrl": "https://cdn.discordapp.com/avatars/443045945643368452/9fea1c51ff15c0c4ceedf72b081cee94.png?size=512",
+        "bannerUrl": null
+      }
+    },
+    {
+      "userId": "493103786936500236",
+      "nickname": "vertexv",
+      "displayName": "vertexv",
+      "color": "#9B59B6",
+      "avatarUrl": null,
+      "bannerUrl": null,
+      "joinedAt": "2024-01-13T06:40:46.203+01:00",
+      "premiumSince": null,
+      "isPending": false,
+      "flags": [],
+      "roles": [
+        {
+          "id": "372273266842271755",
+          "name": "N+",
+          "color": "#9B59B6",
+          "position": 22
+        },
+        {
+          "id": "371983547982020609",
+          "name": "N++",
+          "color": "#1ABC9C",
+          "position": 21
+        },
+        {
+          "id": "480463575018635294",
+          "name": "Steam",
+          "color": null,
+          "position": 17
+        },
+        {
+          "id": "1299110790824988783",
+          "name": "contest",
+          "color": null,
+          "position": 1
+        }
+      ],
+      "user": {
+        "id": "493103786936500236",
+        "name": "vegerito",
+        "discriminator": "0000",
+        "displayName": "vertexv",
+        "isBot": false,
+        "avatarUrl": "https://cdn.discordapp.com/avatars/493103786936500236/7fa24c653a45a759e93eb0e2a67523ae.png?size=512",
+        "bannerUrl": null
+      }
+    },
+    {
+      "userId": "512375199283544075",
+      "nickname": null,
+      "displayName": "quadrupletime",
+      "color": "#1ABC9C",
+      "avatarUrl": null,
+      "bannerUrl": null,
+      "joinedAt": "2022-08-01T10:27:13.123+02:00",
+      "premiumSince": null,
+      "isPending": false,
+      "flags": [],
+      "roles": [
+        {
+          "id": "371983547982020609",
+          "name": "N++",
+          "color": "#1ABC9C",
+          "position": 21
+        },
+        {
+          "id": "480463575018635294",
+          "name": "Steam",
+          "color": null,
+          "position": 17
+        }
+      ],
+      "user": {
+        "id": "512375199283544075",
+        "name": "quadrupletime",
+        "discriminator": "0000",
+        "displayName": "quadrupletime",
+        "isBot": false,
+        "avatarUrl": "https://cdn.discordapp.com/avatars/512375199283544075/3bc949e4c6fbbec023caca35dceff1ef.png?size=512",
+        "bannerUrl": null
+      }
+    },
+    {
+      "userId": "535634130436620298",
+      "nickname": null,
+      "displayName": "outte++",
+      "color": "#206694",
+      "avatarUrl": null,
+      "bannerUrl": null,
+      "joinedAt": "2020-02-28T23:43:15.299+01:00",
+      "premiumSince": null,
+      "isPending": false,
+      "flags": [],
+      "roles": [
+        {
+          "id": "296190514468749312",
+          "name": "DRONE",
+          "color": "#206694",
+          "position": 26
+        }
+      ],
+      "user": {
+        "id": "535634130436620298",
+        "name": "outte++",
+        "discriminator": "2937",
+        "displayName": "outte++",
+        "isBot": true,
+        "avatarUrl": "https://cdn.discordapp.com/avatars/535634130436620298/843ddb0a49a0bc71735ed2eae4e1ce37.png?size=512",
+        "bannerUrl": null
+      }
+    },
+    {
+      "userId": "609229834123739156",
+      "nickname": "$yax",
+      "displayName": "$yax",
+      "color": "#79CBE3",
+      "avatarUrl": null,
+      "bannerUrl": null,
+      "joinedAt": "2023-03-16T16:17:09.241+01:00",
+      "premiumSince": null,
+      "isPending": false,
+      "flags": [],
+      "roles": [
+        {
+          "id": "534312702496079881",
+          "name": "100%",
+          "color": "#79CBE3",
+          "position": 28
+        },
+        {
+          "id": "1104919320968036442",
+          "name": "200%",
+          "color": null,
+          "position": 3
+        }
+      ],
+      "user": {
+        "id": "609229834123739156",
+        "name": "y4xm1n",
+        "discriminator": "0000",
+        "displayName": "YaxMin",
+        "isBot": false,
+        "avatarUrl": "https://cdn.discordapp.com/avatars/609229834123739156/1366e70b3c8fcd414ff3be7cd66e2ca6.png?size=512",
+        "bannerUrl": null
+      }
+    },
+    {
+      "userId": "655524830002806805",
+      "nickname": null,
+      "displayName": "paul.",
+      "color": "#1ABC9C",
+      "avatarUrl": null,
+      "bannerUrl": null,
+      "joinedAt": "2019-12-14T22:41:55.964+01:00",
+      "premiumSince": null,
+      "isPending": false,
+      "flags": [],
+      "roles": [
+        {
+          "id": "371983547982020609",
+          "name": "N++",
+          "color": "#1ABC9C",
+          "position": 21
+        },
+        {
+          "id": "480463575018635294",
+          "name": "Steam",
+          "color": null,
+          "position": 17
+        }
+      ],
+      "user": {
+        "id": "655524830002806805",
+        "name": "paul.1947",
+        "discriminator": "0000",
+        "displayName": "paul.",
+        "isBot": false,
+        "avatarUrl": "https://cdn.discordapp.com/avatars/655524830002806805/32fa30eacb94dac13dce771059b993e8.png?size=512",
+        "bannerUrl": null
+      }
+    },
+    {
+      "userId": "735132703426609264",
+      "nickname": null,
+      "displayName": "Waila The Wednesday",
+      "color": null,
+      "avatarUrl": null,
+      "bannerUrl": null,
+      "joinedAt": "2025-01-02T01:52:12.478+01:00",
+      "premiumSince": null,
+      "isPending": false,
+      "flags": [],
+      "roles": [],
+      "user": {
+        "id": "735132703426609264",
+        "name": "willthewednesday",
+        "discriminator": "0000",
+        "displayName": "Waila The Wednesday",
+        "isBot": false,
+        "avatarUrl": "https://cdn.discordapp.com/avatars/735132703426609264/a4001c17b9d28d54bc4c3afc1e2760cf.png?size=512",
+        "bannerUrl": null
+      }
+    },
+    {
+      "userId": "743229799601799261",
+      "nickname": "kkstrong",
+      "displayName": "kkstrong",
+      "color": "#2ECC71",
+      "avatarUrl": null,
+      "bannerUrl": null,
+      "joinedAt": "2020-09-14T23:25:41.376+02:00",
+      "premiumSince": null,
+      "isPending": false,
+      "flags": [],
+      "roles": [
+        {
+          "id": "652032015658385428",
+          "name": "PS4 N++ Grandmaster",
+          "color": "#2ECC71",
+          "position": 39
+        },
+        {
+          "id": "942483228206456923",
+          "name": "Current/Past Grandmasters",
+          "color": null,
+          "position": 29
+        },
+        {
+          "id": "371983547982020609",
+          "name": "N++",
+          "color": "#1ABC9C",
+          "position": 21
+        },
+        {
+          "id": "480463630610071552",
+          "name": "PS4/PS5",
+          "color": null,
+          "position": 16
+        }
+      ],
+      "user": {
+        "id": "743229799601799261",
+        "name": "kkstrong",
+        "discriminator": "0000",
+        "displayName": "kkstrong",
+        "isBot": false,
+        "avatarUrl": "https://cdn.discordapp.com/avatars/743229799601799261/c33fb3dce9662b38fb514691d7a544f6.png?size=512",
+        "bannerUrl": null
+      }
+    },
+    {
+      "userId": "750469606212239381",
+      "nickname": "lily [7218 / 7280]",
+      "displayName": "lily [7218 / 7280]",
+      "color": null,
+      "avatarUrl": null,
+      "bannerUrl": null,
+      "joinedAt": "2023-08-10T04:41:53.337+02:00",
+      "premiumSince": null,
+      "isPending": false,
+      "flags": [],
+      "roles": [
+        {
+          "id": "480463575018635294",
+          "name": "Steam",
+          "color": null,
+          "position": 17
+        },
+        {
+          "id": "480463691326947329",
+          "name": "Switch",
+          "color": null,
+          "position": 14
+        },
+        {
+          "id": "469345056462077952",
+          "name": "racer",
+          "color": null,
+          "position": 11
+        },
+        {
+          "id": "811357022851301396",
+          "name": "she/her",
+          "color": null,
+          "position": 6
+        },
+        {
+          "id": "811358028178915338",
+          "name": "they/them",
+          "color": null,
+          "position": 4
+        }
+      ],
+      "user": {
+        "id": "750469606212239381",
+        "name": "lily_warped303",
+        "discriminator": "0000",
+        "displayName": "lily",
+        "isBot": false,
+        "avatarUrl": "https://cdn.discordapp.com/avatars/750469606212239381/334d4cccb817788665f1845a1338a10f.png?size=512",
+        "bannerUrl": null
+      }
+    },
+    {
+      "userId": "788968436210204742",
+      "nickname": "Logging in...",
+      "displayName": "Logging in...",
+      "color": "#D7342A",
+      "avatarUrl": null,
+      "bannerUrl": null,
+      "joinedAt": "2020-12-17T17:49:03.557+01:00",
+      "premiumSince": null,
+      "isPending": false,
+      "flags": [],
+      "roles": [
+        {
+          "id": "371983346059968525",
+          "name": "Nv2",
+          "color": "#D7342A",
+          "position": 23
+        },
+        {
+          "id": "371983547982020609",
+          "name": "N++",
+          "color": "#1ABC9C",
+          "position": 21
+        },
+        {
+          "id": "469345056462077952",
+          "name": "racer",
+          "color": null,
+          "position": 11
+        },
+        {
+          "id": "852408288879706122",
+          "name": "Voyeur",
+          "color": null,
+          "position": 10
+        },
+        {
+          "id": "811357853536616479",
+          "name": "he/him",
+          "color": null,
+          "position": 5
+        },
+        {
+          "id": "1299110790824988783",
+          "name": "contest",
+          "color": null,
+          "position": 1
+        }
+      ],
+      "user": {
+        "id": "788968436210204742",
+        "name": "aloading.",
+        "discriminator": "0000",
+        "displayName": "Logging in...",
+        "isBot": false,
+        "avatarUrl": "https://cdn.discordapp.com/avatars/788968436210204742/f653f83a4b88feb615e127c64b3fd627.png?size=512",
+        "bannerUrl": null
+      }
+    },
+    {
+      "userId": "967966694209368104",
+      "nickname": "Anna",
+      "displayName": "Anna",
+      "color": null,
+      "avatarUrl": null,
+      "bannerUrl": null,
+      "joinedAt": "2024-08-22T01:26:14.588+02:00",
+      "premiumSince": null,
+      "isPending": false,
+      "flags": [],
+      "roles": [
+        {
+          "id": "811357022851301396",
+          "name": "she/her",
+          "color": null,
+          "position": 6
+        }
+      ],
+      "user": {
+        "id": "967966694209368104",
+        "name": "user25376122",
+        "discriminator": "0000",
+        "displayName": "1111111",
+        "isBot": false,
+        "avatarUrl": "https://cdn.discordapp.com/avatars/967966694209368104/66a6e0b545913caa8e66fc255006ec2c.png?size=512",
+        "bannerUrl": null
+      }
+    },
+    {
+      "userId": "1255619271699206244",
+      "nickname": null,
+      "displayName": "MegalordX8",
+      "color": "#F47FFF",
+      "avatarUrl": null,
+      "bannerUrl": null,
+      "joinedAt": "2025-08-27T04:41:42.442+02:00",
+      "premiumSince": "2025-08-27T04:43:46.953+02:00",
+      "isPending": false,
+      "flags": [
+        "DmSettingsUpsellAcknowledged"
+      ],
+      "roles": [
+        {
+          "id": "585564324634951704",
+          "name": "Nitro Booster",
+          "color": "#F47FFF",
+          "position": 25
+        },
+        {
+          "id": "371983346059968525",
+          "name": "Nv2",
+          "color": "#D7342A",
+          "position": 23
+        },
+        {
+          "id": "371983547982020609",
+          "name": "N++",
+          "color": "#1ABC9C",
+          "position": 21
+        },
+        {
+          "id": "480463575018635294",
+          "name": "Steam",
+          "color": null,
+          "position": 17
+        },
+        {
+          "id": "480463630610071552",
+          "name": "PS4/PS5",
+          "color": null,
+          "position": 16
+        }
+      ],
+      "user": {
+        "id": "1255619271699206244",
+        "name": "megalordx8_2024",
+        "discriminator": "0000",
+        "displayName": "MegalordX8",
+        "isBot": false,
+        "avatarUrl": "https://cdn.discordapp.com/avatars/1255619271699206244/679ca930f3a090cb629570dd1a6534fc.png?size=512",
+        "bannerUrl": null
+      }
+    },
+    {
+      "userId": "1282519086105886753",
+      "nickname": null,
+      "displayName": "Sprix36",
+      "color": null,
+      "avatarUrl": null,
+      "bannerUrl": null,
+      "joinedAt": "2025-01-02T02:58:44.068+01:00",
+      "premiumSince": null,
+      "isPending": false,
+      "flags": [],
+      "roles": [],
+      "user": {
+        "id": "1282519086105886753",
+        "name": "sprix36_",
+        "discriminator": "0000",
+        "displayName": "Sprix36",
+        "isBot": false,
+        "avatarUrl": "https://cdn.discordapp.com/avatars/1282519086105886753/4cd0ed270ce7890bf191c00efb873f98.png?size=512",
+        "bannerUrl": null
+      }
+    }
+  ],
+  "memberCount": 54
+}
