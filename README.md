@@ -26,8 +26,8 @@ losing what an earlier run saw.
   the two.
 - **Member rosters.** The fork's `exportusers` documents import too, filling in everyone who
   never posted.
-- **Engine-agnostic.** SQLite today, in one self-contained file; the adapter layer exists so
-  MySQL and PostgreSQL are a new file rather than a new code path.
+- **Three engines, one archive.** SQLite, MySQL and PostgreSQL. The same exports produce a
+  byte-identical archive on all three, which the test suite asserts.
 - **Streams large files.** Exports past a threshold are read with a constant memory footprint:
   a 129 MiB export imports in a 9 MiB peak, against the ~1.3 GiB that parsing it outright would
   cost.
@@ -35,10 +35,13 @@ losing what an earlier run saw.
 ## Installation
 
 ```bash
-pip install .
+pip install .                 # SQLite, which needs no driver
+pip install '.[mysql]'        # ...and MySQL
+pip install '.[postgres]'     # ...and PostgreSQL
+pip install '.[all]'          # ...and both
 ```
 
-Python 3.10 or newer.
+Python 3.10 or newer. MySQL 8.0.13+ or MariaDB 10.8+; PostgreSQL 9.5+.
 
 ## Usage
 
@@ -51,7 +54,9 @@ Quote patterns so dce2sql expands them rather than the shell.
 
 | Option | Meaning |
 | --- | --- |
-| `-e`, `--engine` | Database engine (default: `sqlite`) |
+| `-e`, `--engine` | `sqlite`, `mysql` or `postgres` (default: `sqlite`) |
+| `--host`, `--port`, `--user`, `--password` | Server connection details; ignored by SQLite |
+| `--no-create` | Fail if the database does not exist, instead of creating it |
 | `-l`, `--list` | List the files that would be processed, then exit |
 | `-n`, `--dry-run` | Parse and report what is in the exports, without touching the database |
 | `--batch-size N` | Messages buffered before each write (default: 500) |
@@ -74,6 +79,17 @@ Check what a directory of exports contains before committing to importing it:
 dce2sql archive.db exports/ --dry-run
 ```
 
+Use a server instead of a file, giving the database as a name or a URL:
+
+```bash
+dce2sql archive --engine postgres --user me exports/
+dce2sql postgresql://me@localhost/archive exports/
+```
+
+The database is created if it does not exist. The password comes from `--password`, else from
+`DCE2SQL_PASSWORD`, else it is asked for — prefer the last two, since an argument is visible to
+anyone who can list processes.
+
 Then query it:
 
 ```sql
@@ -83,6 +99,23 @@ WHERE m.timestamp >= strftime('%s', '2019-01-01')
   AND m.timestamp <  strftime('%s', '2020-01-01')
 GROUP BY u.id ORDER BY posts DESC LIMIT 10;
 ```
+
+## Engines
+
+| | SQLite | MySQL | PostgreSQL |
+| --- | --- | --- | --- |
+| Driver | built in | PyMySQL or mysqlclient | psycopg 3 or psycopg2 |
+| Timestamps | Unix seconds | `DATETIME`, UTC | `TIMESTAMPTZ` |
+| Booleans | 0 / 1 | `BOOLEAN` | `BOOLEAN` |
+| Rich fields | text | `JSON` | `JSONB` |
+| Throughput | ~3,100 msg/s | ~1,100 msg/s | ~1,300 msg/s |
+
+SQLite is the default and the fastest, and puts the whole archive in one file you can copy
+anywhere. A server is worth it when several people or tools need to query the archive at once,
+or when you want the indexing and query planning that `JSONB` and a real timestamp type bring.
+
+Whichever you choose, the archive is the same: the suite imports the same exports into all
+three and asserts the resulting databases match, row for row.
 
 ## Documentation
 

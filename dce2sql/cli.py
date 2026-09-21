@@ -10,7 +10,7 @@ import time
 from pathlib import Path
 
 from . import __version__
-from .adapters import DEFAULT_ENGINE, ENGINES, create
+from .adapters import DEFAULT_ENGINE, ENGINES, create, parse_url
 from .documents import Document
 from .importer import Importer
 from .progress import ImportProgress
@@ -37,10 +37,21 @@ def build_parser() -> argparse.ArgumentParser:
             "  dce2sql archive.db 'exports/**/*.json'\n"
             "  dce2sql archive.db exports/ --dry-run\n"
             "  dce2sql archive.db 'exports/*.json' --list\n"
+            "  dce2sql archive -e postgres --user me exports/\n"
+            "  dce2sql postgresql://me@localhost/archive exports/\n"
+            "\n"
+            "the password, for a server engine, is taken from --password, else from\n"
+            "DCE2SQL_PASSWORD, else asked for at the terminal.\n"
         ),
     )
 
-    parser.add_argument("database", help="database file, or name on the server")
+    parser.add_argument(
+        "database",
+        help=(
+            "database file for SQLite, database name on the server otherwise, "
+            "or a full URL such as postgresql://user@host/archive"
+        ),
+    )
     parser.add_argument(
         "sources",
         nargs="+",
@@ -54,9 +65,30 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "-e",
         "--engine",
-        default=DEFAULT_ENGINE,
+        default=None,
         choices=sorted(ENGINES),
-        help=f"database engine (default: {DEFAULT_ENGINE})",
+        help=f"database engine (default: {DEFAULT_ENGINE}, or taken from a URL)",
+    )
+
+    server = parser.add_argument_group(
+        "server options", "Ignored by SQLite, which has no server."
+    )
+    server.add_argument("--host", default=None, help="server host (default: localhost)")
+    server.add_argument("--port", type=int, default=None, help="server port")
+    server.add_argument("--user", default=None, help="user to connect as")
+    server.add_argument(
+        "--password",
+        default=None,
+        help=(
+            "password. Prefer the DCE2SQL_PASSWORD environment variable or the prompt: "
+            "a password given here is visible to anyone who can list processes"
+        ),
+    )
+    server.add_argument(
+        "--no-create",
+        action="store_false",
+        dest="create",
+        help="fail if the database does not exist, instead of creating it",
     )
     parser.add_argument(
         "-l",
@@ -153,6 +185,56 @@ def _scan(directory: Path) -> list[Source]:
     return sorted(out, key=lambda s: s.path)
 
 
+def connection_options(args, console) -> dict:
+    """Work out which engine to use and how to reach it.
+
+    A URL settles everything at once; otherwise the flags do, with the engine defaulting to
+    SQLite.  Explicit flags win over a URL, so a stored URL can be reused with one part changed.
+    """
+    options = {"engine": args.engine or DEFAULT_ENGINE, "database": args.database}
+
+    from_url = parse_url(args.database)
+    if from_url is not None:
+        options = {**from_url, **({"engine": args.engine} if args.engine else {})}
+
+    for name in ("host", "port", "user", "password"):
+        given = getattr(args, name, None)
+        if given is not None:
+            options[name] = given
+
+    options["create"] = args.create
+    options.setdefault("host", "localhost")
+
+    if options["engine"] != "sqlite" and options.get("password") is None:
+        options["password"] = _password(options.get("user"), console)
+
+    return options
+
+
+def _password(user, console) -> str | None:
+    """A password from the environment, or asked for, but never guessed.
+
+    Kept off the command line where it can be: an argument is visible in the process list and
+    ends up in shell history, which for a long-lived archive credential is worse than it
+    sounds.
+    """
+    from_env = os.environ.get("DCE2SQL_PASSWORD")
+    if from_env is not None:
+        return from_env
+
+    if not sys.stdin.isatty():
+        return None
+
+    import getpass
+
+    who = f" for {user}" if user else ""
+    try:
+        return getpass.getpass(f"Password{who} (blank for none): ") or None
+    except (EOFError, KeyboardInterrupt):
+        console.print()
+        return None
+
+
 def main(argv: list[str] | None = None) -> int:
     from rich.console import Console
 
@@ -180,12 +262,14 @@ def main(argv: list[str] | None = None) -> int:
     stats = Stats()
     started = time.time()
 
+    connection = None if args.dry_run else connection_options(args, console)
+
     show_progress = not args.no_progress and console.is_terminal
     with ImportProgress(total, enabled=show_progress, console=console) as progress:
         if args.dry_run:
             failed = _dry_run(sources, stats, progress)
         else:
-            failed = _import(args, sources, stats, progress)
+            failed = _import(args, connection, sources, stats, progress)
 
     stats.seconds = time.time() - started
 
@@ -195,12 +279,18 @@ def main(argv: list[str] | None = None) -> int:
     return 1 if failed else 0
 
 
-def _import(args, sources: list[Source], stats: Stats, progress: ImportProgress) -> bool:
-    adapter = create(args.engine, args.database)
+def _import(
+    args, connection: dict, sources: list[Source], stats: Stats, progress: ImportProgress
+) -> bool:
+    engine = connection.pop("engine")
+    database = connection.pop("database")
+    adapter = create(engine, database, **connection)
+
     try:
         adapter.connect()
     except Exception as exc:  # noqa: BLE001
-        progress.log(f"[red]cannot open {args.database}:[/red] {exc}")
+        where = adapter.describe() if hasattr(adapter, "describe") else database
+        progress.log(f"[red]cannot open {where}:[/red] {exc}")
         return True
 
     try:
@@ -273,10 +363,18 @@ def summarize(adapter, stats: Stats) -> None:
         stats.archive.clear()
 
 
-def _date(unix_seconds: int) -> str:
+def _date(instant) -> str:
+    """Format a stored timestamp, whichever way the engine gave it back.
+
+    SQLite keeps Unix seconds; MySQL and PostgreSQL have native types and hand back a datetime.
+    """
     from datetime import datetime, timezone
 
-    return datetime.fromtimestamp(unix_seconds, timezone.utc).strftime("%Y-%m-%d")
+    if isinstance(instant, datetime):
+        if instant.tzinfo is None:
+            instant = instant.replace(tzinfo=timezone.utc)
+        return instant.astimezone(timezone.utc).strftime("%Y-%m-%d")
+    return datetime.fromtimestamp(instant, timezone.utc).strftime("%Y-%m-%d")
 
 
 def _dry_run(sources: list[Source], stats: Stats, progress: ImportProgress) -> bool:

@@ -12,7 +12,7 @@ import json
 
 import pytest
 from conftest import fixture
-from support import diff, import_files, regressions, rows, snapshot
+from support import diff, import_files, regressions, rows, snapshot, with_rich_json
 
 #: The four exports carrying the full field set, grouped by how they write people.  Within a
 #: group the files differ only in whether entities are inlined or referenced from lookup
@@ -298,6 +298,50 @@ class TestReactions:
         reference = tmp_path / "reference.db"
         import_files(reference, fixture("split.json"))
         assert not diff(snapshot(db), snapshot(reference))
+
+
+class TestRichJson:
+    """The two columns kept as JSON rather than flattened into tables.
+
+    Neither appears in the fixtures -- no message in those two days carried a components tree
+    or forwarded anything -- so the documents are built here instead of hoping for one.
+    """
+
+    def test_a_components_tree_round_trips(self, tmp_path):
+        from support import COMPONENTS
+
+        path, with_components, _ = with_rich_json(tmp_path)
+        db = tmp_path / "archive.db"
+        import_files(db, path)
+
+        stored = rows(db, "SELECT components FROM messages WHERE id = ?", (with_components,))
+        assert json.loads(stored[0][0]) == COMPONENTS
+
+    def test_a_forward_is_kept_whole(self, tmp_path):
+        """It has no ID and no author, so there is nothing to key its children by."""
+        from support import FORWARD
+
+        path, _, with_forward = with_rich_json(tmp_path)
+        db = tmp_path / "archive.db"
+        import_files(db, path)
+
+        stored = rows(
+            db, "SELECT forwarded, reference_id, reference_type FROM messages WHERE id = ?",
+            (with_forward,),
+        )[0]
+        assert json.loads(stored[0])["content"] == FORWARD["content"]
+        assert stored[1] == 1234567890123456789
+        assert stored[2] == 1, "Forward"
+
+    def test_and_neither_reads_as_an_edit_on_re_import(self, tmp_path):
+        path, _, _ = with_rich_json(tmp_path)
+        db = tmp_path / "archive.db"
+        import_files(db, path)
+        before = snapshot(db)
+
+        import_files(db, path)
+        problems = diff(before, snapshot(db))
+        assert not problems, chr(10).join(problems)
 
 
 class TestVolatileUrls:

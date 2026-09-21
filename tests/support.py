@@ -9,15 +9,16 @@ matter: *the same*, and *never worse*.
 
 from __future__ import annotations
 
-import sqlite3
+import json
 from dataclasses import dataclass
-from pathlib import Path
+from datetime import datetime, timezone
 
 from dce2sql import schema
 from dce2sql.adapters import create
 from dce2sql.documents import Document
 from dce2sql.importer import Importer
 from dce2sql.reader import Source, open_document
+from dce2sql.schema import BOOL, JSON, TS
 from dce2sql.util import unsigned_url
 
 #: Columns that record when an import happened rather than what was imported.
@@ -39,9 +40,21 @@ class Snap:
         return {tuple(row[i] for i in positions): row for row in self.rows}
 
 
-def import_files(db_path: Path, *json_paths) -> Importer:
+def open_adapter(target):
+    """Build an adapter from either a SQLite path or a dict of connection options.
+
+    Lets a test say *what* it wants to prove without saying which engine it is proving it on,
+    which is the whole point of having an adapter layer.
+    """
+    if isinstance(target, dict):
+        options = dict(target)
+        return create(options.pop("engine"), options.pop("database"), **options)
+    return create("sqlite", str(target))
+
+
+def import_files(target, *json_paths) -> Importer:
     """Import one or more exports into a database, creating it if needed."""
-    adapter = create("sqlite", str(db_path))
+    adapter = open_adapter(target)
     adapter.connect()
     try:
         adapter.create_schema()
@@ -56,16 +69,35 @@ def import_files(db_path: Path, *json_paths) -> Importer:
         adapter.close()
 
 
-def snapshot(db_path: Path, tables=None, skip_columns=frozenset()) -> dict[str, Snap]:
+def drop_everything(target) -> None:
+    """Empty a server database between tests, since it outlives the process."""
+    adapter = open_adapter(target)
+    adapter.connect()
+    try:
+        for table in reversed(schema.TABLES):
+            adapter.execute(f"DROP TABLE IF EXISTS {adapter.quote(table.name)}")
+        adapter.commit()
+    finally:
+        adapter.close()
+
+
+def snapshot(target, tables=None, skip_columns=frozenset()) -> dict[str, Snap]:
     """Reduce a database to ``{table: Snap}``, leaving out bookkeeping.
 
     Rows come back sorted rather than in insertion order, because two imports that produce the
     same data need not produce it in the same sequence -- a normalized export resolves its
     lookup tables at the end, an inline one as it goes.  Auto-assigned keys are dropped for the
     same reason: they are an artifact of insertion order, not data.
+
+    Values are reduced to one canonical form as well, so that a snapshot means the same thing
+    whichever engine produced it: SQLite has to fake booleans, timestamps and JSON as integers
+    and text, while MySQL and PostgreSQL have all three natively.  Two archives holding the
+    same thing must compare equal across that divide -- which is itself worth asserting, and
+    ``test_server_engines.py`` does.
     """
     tables = tables or [t for t in schema.DATA_TABLES if t not in SKIP_TABLES]
-    connection = sqlite3.connect(str(db_path))
+    adapter = open_adapter(target)
+    adapter.connect()
     try:
         out = {}
         for name in tables:
@@ -75,13 +107,13 @@ def snapshot(db_path: Path, tables=None, skip_columns=frozenset()) -> dict[str, 
                 for c in table.columns
                 if c.name not in VOLATILE and c.name not in skip_columns and not c.auto
             )
-            rows = connection.execute(
-                f"SELECT {', '.join(columns)} FROM {name}"
-            ).fetchall()
-            out[name] = Snap(columns, sorted(_unsign(table, columns, rows), key=_sort_key))
+            selected = ", ".join(adapter.quote(c) for c in columns)
+            rows = adapter.fetchall(f"SELECT {selected} FROM {adapter.quote(name)}")
+            rows = [_canonical(table, columns, row) for row in rows]
+            out[name] = Snap(columns, sorted(rows, key=_sort_key))
         return out
     finally:
-        connection.close()
+        adapter.close()
 
 
 def natural_key(table_name: str, available: tuple[str, ...]) -> tuple[str, ...]:
@@ -91,10 +123,10 @@ def natural_key(table_name: str, available: tuple[str, ...]) -> tuple[str, ...]:
     if not table.primary_key.auto:
         candidate = (table.primary_key.name,)
     elif table.unique:
-        # Unwrap COALESCE(col, 0) back to the bare column name
+        # A NullSafe part identifies the row by its underlying column
         candidate = tuple(
-            group.split("(")[1].split(",")[0].strip() if "(" in group else group
-            for group in table.unique[0]
+            part.column if isinstance(part, schema.NullSafe) else part
+            for part in table.unique[0]
         )
     else:
         candidate = tuple(c.name for c in table.columns if not c.auto)
@@ -166,33 +198,113 @@ def regressions(before: dict[str, Snap], after: dict[str, Snap]) -> list[str]:
     return problems
 
 
-def rows(db_path: Path, sql: str, params=()) -> list[tuple]:
-    connection = sqlite3.connect(str(db_path))
-    try:
-        return connection.execute(sql, params).fetchall()
-    finally:
-        connection.close()
+def rows(target, sql: str, params=()) -> list[tuple]:
+    """Run a query against a database, whichever engine it is on.
 
-
-def _unsign(table, columns, rows):
-    """Strip Discord's CDN signature before comparing.
-
-    Two exports of the same attachment never agree on it -- it is re-signed on every run and
-    expires within a day -- so leaving it in would make every cross-export comparison fail on
-    something that is not a difference. The importer already declines to *update* a row over
-    it; this is the same judgement applied to two databases built independently.
+    The SQL in the tests is written unquoted and in lower case, which every engine here accepts
+    for these table and column names, so the same query serves all three.
     """
-    signed = [i for i, name in enumerate(columns) if table.column(name).signed_url]
-    if not signed:
-        return rows
+    adapter = open_adapter(target)
+    adapter.connect()
+    try:
+        return adapter.fetchall(sql.replace("?", adapter.placeholder), params)
+    finally:
+        adapter.close()
+
+
+def _canonical(table, columns, row):
+    """Reduce one row to a form that does not depend on the engine that stored it.
+
+    Three conversions, and one judgement:
+
+    * a timestamp becomes Unix seconds, whether it arrived as an integer or a ``datetime``;
+    * a boolean becomes 0 or 1, whether it arrived as one of those or as ``True``;
+    * a JSON document becomes its sorted text, whether it arrived as text or already parsed;
+    * a CDN link loses its signature, because Discord re-signs it on every export and two
+      exports of the same attachment therefore never agree on it.
+    """
     out = []
-    for row in rows:
-        row = list(row)
-        for i in signed:
-            if isinstance(row[i], str):
-                row[i] = unsigned_url(row[i])
-        out.append(tuple(row))
-    return out
+    for name, value in zip(columns, row):
+        column = table.column(name)
+        if value is None:
+            out.append(None)
+        elif column.type == TS:
+            out.append(_epoch(value))
+        elif column.type == BOOL:
+            out.append(1 if value else 0)
+        elif column.type == JSON:
+            out.append(_json_text(value))
+        elif column.signed_url and isinstance(value, str):
+            out.append(unsigned_url(value))
+        else:
+            out.append(value)
+    return tuple(out)
+
+
+def _epoch(value):
+    if isinstance(value, datetime):
+        if value.tzinfo is None:
+            value = value.replace(tzinfo=timezone.utc)
+        return int(value.timestamp())
+    return int(value)
+
+
+def _json_text(value):
+    if isinstance(value, (bytes, bytearray)):
+        value = value.decode("utf-8")
+    if isinstance(value, str):
+        try:
+            value = json.loads(value)
+        except ValueError:
+            return value
+    return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+
+
+#: A components tree and a forward, neither of which the fixtures happen to contain. Both are
+#: stored as JSON, which is the one column type the engines disagree about most.
+COMPONENTS = [
+    {
+        "type": 1,
+        "components": [
+            {"type": 2, "style": 5, "label": "Open", "url": "https://example.invalid/a"},
+            {"type": 2, "style": 1, "label": "Vote", "customId": "vote:1"},
+        ],
+    }
+]
+
+FORWARD = {
+    "timestamp": "2024-12-25T10:00:00+00:00",
+    "timestampEdited": None,
+    "content": "the original message, quoted from somewhere else",
+    "attachments": [],
+    "embeds": [],
+    "stickers": [],
+    "components": [],
+}
+
+
+def with_rich_json(tmp_path, name="ext.json"):
+    """A copy of a fixture whose first two messages carry the JSON-valued columns."""
+    import json
+
+    from conftest import fixture
+
+    with fixture(name).open(encoding="utf-8") as handle:
+        document = json.load(handle)
+
+    document["messages"][0]["components"] = COMPONENTS
+    document["messages"][1]["forwardedMessage"] = FORWARD
+    document["messages"][1]["reference"] = {
+        "type": "Forward",
+        "messageId": "1234567890123456789",
+        "channelId": None,
+        "guildId": None,
+    }
+
+    path = tmp_path / "rich.json"
+    with path.open("w", encoding="utf-8") as handle:
+        json.dump(document, handle, ensure_ascii=False)
+    return path, int(document["messages"][0]["id"]), int(document["messages"][1]["id"])
 
 
 def _sort_key(row):

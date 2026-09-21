@@ -28,6 +28,11 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+# Database drivers, one extra per engine. SQLite needs none: it is in the standard library,
+# which is most of why it is the default.
+mysql = ["PyMySQL>=1.0"]
+postgres = ["psycopg[binary]>=3.1"]
+all = ["PyMySQL>=1.0", "psycopg[binary]>=3.1"]
 dev = ["pytest>=7.0"]
 
 [project.scripts]

@@ -40,7 +40,7 @@ The database contains the following [**base tables**](#base-tables), which are t
 
 Some notes about specific common fields:
 
-- **Timestamps** are to be stored with native types for engines that support it, otherwise (e.g. SQLite) they'll be stored as integers instead (UNIX timestamp).
+- **Timestamps** are to be stored with native types for engines that support it, otherwise (e.g. SQLite) they'll be stored as integers instead (UNIX timestamp). Everything is UTC: PostgreSQL uses `TIMESTAMPTZ`, MySQL a `DATETIME` with the session pinned to `+00:00`, since its `DATETIME` carries no offset of its own.
 - **Booleans** shall be stored with native types for engines that support it, otherwise integers (0 and 1) will be used instead (if possible, 1-byte integers).
 - **Colors** will be casted and packed as integers: `R << 16 | G << 8 | B` for RGB colors.
 - **Strings**, for engines that support it (e.g. MySQL), should be stored in place when short enough (e.g. VARCHAR), and by reference when long enough (e.g. TEXT). Other engines, like SQLite, handle this on their own. I'll usually specify the max length of most string fields here so the type can be chosen suitably. Examples of short strings include names or URLs, and examples of (potentially) long strings include message content or channel topics.
@@ -48,9 +48,11 @@ Some notes about specific common fields:
 
 For performance, simple **indexes** are used for all primary and foreign key fields. Foreign keys are all columns whose name ends in `_id`. Indexes will also be placed in all timestamp fields, as well as whenever explicitly mentioned.
 
+Every column whose name ends in `_id` is 8 bytes wide, whether it points at a Discord snowflake or at an auto-assigned key, since all the keys here are 8 bytes. SQLite will not catch a mistake in this — its `INTEGER` is 8 bytes however the column is declared — but MySQL and PostgreSQL will, by rejecting a snowflake outright.
+
 Those references are **not** enforced with foreign key constraints, however. An archive routinely points outside itself: a reply whose parent predates the export range, a sticker from a server that was never exported, a channel that no longer exists. Constraints would turn every one of those into an import failure, which is precisely backwards for a tool whose job is to never lose anything.
 
-Several tables have no natural key, and need one anyway so that re-importing a file doesn't duplicate its rows. Where that is the case it's noted on the table. Unique constraints containing a nullable column are declared over `COALESCE(column, 0)`: every SQL engine treats NULLs as distinct inside a unique index, so without it the constraint would fail to deduplicate exactly the rows a re-import would otherwise double.
+Several tables have no natural key, and need one anyway so that re-importing a file doesn't duplicate its rows. Where that is the case it's noted on the table. Unique constraints containing a nullable column are declared over a `COALESCE` of it: every SQL engine treats NULLs as distinct inside a unique index, so without it the constraint would fail to deduplicate exactly the rows a re-import would otherwise double. The stand-in value has the column's own type — zero for a number, the Unix epoch for a timestamp — which is why it is rendered per engine rather than written into the schema.
 
 ## Base tables
 

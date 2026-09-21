@@ -1,24 +1,34 @@
 """The engine-agnostic half of database access.
 
 Almost all of the SQL this tool emits is the same on every engine; what differs is the type
-names, the placeholder style, the auto-increment keyword and the "insert unless it's already
-there" spelling.  Those are the abstract bits.  Everything built on top of them -- DDL
-rendering, batched selects, inserts and updates -- lives here so that a new engine is a short
-file rather than a reimplementation.
+names, the placeholder style, the auto-increment spelling and how each says "insert unless it
+is already there".  Those are the abstract bits.  Everything built on top of them -- DDL
+rendering, batched selects, inserts, updates and the comparison that decides whether a row has
+changed -- lives here so that a new engine is a short file rather than a reimplementation.
 
-A subclass can be handed straight to :func:`dce2sql.importer.import_file`, which is the
-extension point INSTRUCTIONS.md asks for.
+A subclass can be handed straight to :class:`dce2sql.importer.Importer`, which is the extension
+point INSTRUCTIONS.md asks for.
+
+One thing deserves saying out loud, because it is the reason this layer has a ``differs``
+method at all.  The engines do not agree on how to store a value, and the importer's whole
+merge policy rests on being able to ask "has this actually changed?".  SQLite has no boolean
+and no timestamp, so both become integers; MySQL and PostgreSQL have all three natively, plus
+a real JSON type that normalizes what it is given.  A value therefore does not necessarily come
+back out looking like it went in, and comparing the two naively would report an edit on every
+single row.  ``encode`` maps a Python value into the engine's world and ``differs`` compares
+within it.
 """
 
 from __future__ import annotations
 
+import hashlib
 import json as jsonlib
 from abc import ABC, abstractmethod
 from typing import Any, Iterable, Sequence
 
 from .. import schema
-from ..schema import BOOL, JSON, Column, Table
-from ..util import chunked
+from ..schema import BOOL, JSON, TS, Column, NullSafe, Table
+from ..util import chunked, same_url
 
 #: How many values to put in one ``IN (...)``.  SQLite's default ceiling is 999 bound
 #: parameters; the other engines are far more generous, but there is nothing to gain from
@@ -41,8 +51,21 @@ class Adapter(ABC):
     #: Logical type -> engine type
     types: dict[str, str] = {}
 
+    #: Engine type for an auto-incrementing primary key, when it differs from the plain one
+    #: (PostgreSQL spells it as a type, the others as a keyword on the column)
+    autoincrement_type: str | None = None
+
     #: Appended to the primary key of an auto-incrementing table
     autoincrement: str = "AUTOINCREMENT"
+
+    #: Whether ``CREATE INDEX`` accepts ``IF NOT EXISTS``.  MySQL does not.
+    supports_index_if_not_exists: bool = True
+
+    #: Longest identifier the engine will accept; index names are capped to it
+    max_identifier: int = 63
+
+    #: True for an engine that talks to a server, and so needs a host and credentials
+    is_server: bool = False
 
     def __init__(self) -> None:
         self.connection: Any = None
@@ -130,9 +153,40 @@ class Adapter(ABC):
     def encode_row(self, table: Table, columns: Sequence[str], row: Sequence) -> tuple:
         return tuple(self.encode(table.column(c), v) for c, v in zip(columns, row))
 
+    # -- comparison --------------------------------------------------------------------
+
+    def differs(self, column: Column, stored: Any, incoming: Any) -> bool:
+        """Whether a value has really changed, as opposed to merely being written again.
+
+        This is what the merge policy asks before updating a row, so everything that is not a
+        genuine difference has to be filtered out here.  Two things are not:
+
+        * a Discord CDN link that has simply been re-signed -- the ``ex``, ``is`` and ``hm``
+          parameters are regenerated on every export and expire within a day;
+        * a JSON document the engine stored natively and handed back in its own normal form,
+          reordered or reformatted but meaning exactly the same thing.
+        """
+        if self.equivalent(column, stored, incoming):
+            return False
+        if column.signed_url and same_url(stored, incoming):
+            return False
+        return True
+
+    def equivalent(self, column: Column, stored: Any, incoming: Any) -> bool:
+        """Whether two values of this column mean the same thing to this engine."""
+        if stored == incoming:
+            return True
+        if column.type == JSON:
+            return _json_equal(stored, incoming)
+        if column.type == TS:
+            return _instant_equal(stored, incoming)
+        return False
+
     # -- DDL ---------------------------------------------------------------------------
 
     def column_type(self, column: Column) -> str:
+        if column.auto and self.autoincrement_type:
+            return self.autoincrement_type
         rendered = self.types[column.type]
         if column.size and "{size}" in rendered:
             return rendered.format(size=column.size)
@@ -150,34 +204,90 @@ class Adapter(ABC):
             parts.append(f"DEFAULT {self.encode(column, column.default)}")
         return " ".join(parts)
 
-    def table_ddl(self, table: Table) -> list[str]:
-        """``CREATE TABLE`` plus every index and unique constraint, all idempotent."""
+    def create_table_ddl(self, table: Table) -> str:
         columns = ",\n  ".join(self.column_ddl(table, c) for c in table.columns)
-        statements = [
-            f"CREATE TABLE IF NOT EXISTS {self.quote(table.name)} (\n  {columns}\n)"
-        ]
+        return f"CREATE TABLE IF NOT EXISTS {self.quote(table.name)} (\n  {columns}\n)"
+
+    def index_expression(self, table: Table, part) -> str:
+        """Render one key part of an index.
+
+        A plain column name is quoted as an identifier.  A :class:`NullSafe` part becomes an
+        expression, wrapped in its own parentheses: MySQL requires them around a functional key
+        part, and the others tolerate a redundant pair.
+        """
+        if not isinstance(part, NullSafe):
+            return self.quote(part)
+        column = table.column(part.column)
+        return f"(COALESCE({self.quote(column.name)}, {self.null_sentinel(column)}))"
+
+    def null_sentinel(self, column: Column) -> str:
+        """The stand-in a NULL becomes inside a unique index.
+
+        Zero for anything numeric: no Discord ID is ever 0 except the synthetic "Direct
+        Messages" guild, which never appears in one of these positions.  A timestamp needs a
+        literal of its own type, which is why this is the adapter's business.
+        """
+        return "0"
+
+    def index_name(self, prefix: str, table: str, label: str) -> str:
+        """An index name the engine will accept.
+
+        Names are derived from the columns, which can run past the 63 or 64 characters engines
+        allow.  An over-long one is truncated and given a short digest of the full name, so it
+        stays unique and stays the same on every run -- an index that changed name between runs
+        would be created afresh each time.
+        """
+        name = f"{prefix}_{table}_{label}"
+        if len(name) <= self.max_identifier:
+            return name
+        digest = hashlib.sha1(name.encode("utf-8")).hexdigest()[:8]
+        return name[: self.max_identifier - 9] + "_" + digest
+
+    def index_ddl(self, table: Table) -> list[str]:
+        """Every index and unique constraint for a table, skipping those already there."""
+        existing = self.existing_indexes(table.name)
+        guard = "IF NOT EXISTS " if self.supports_index_if_not_exists else ""
+        statements = []
 
         for group in table.unique:
-            # An expression can't be quoted as an identifier; a plain column name can
-            rendered = ", ".join(g if "(" in g else self.quote(g) for g in group)
-            label = "_".join(_slug(g) for g in group)
+            name = self.index_name("ux", table.name, "_".join(_slug(g) for g in group))
+            if name in existing:
+                continue
+            parts = ", ".join(self.index_expression(table, g) for g in group)
             statements.append(
-                f"CREATE UNIQUE INDEX IF NOT EXISTS "
-                f"{self.quote(f'ux_{table.name}_{label}')} "
-                f"ON {self.quote(table.name)} ({rendered})"
+                f"CREATE UNIQUE INDEX {guard}{self.quote(name)} "
+                f"ON {self.quote(table.name)} ({parts})"
             )
 
-        for name in table.indexed():
+        for column in table.indexed():
+            name = self.index_name("ix", table.name, column)
+            if name in existing:
+                continue
             statements.append(
-                f"CREATE INDEX IF NOT EXISTS {self.quote(f'ix_{table.name}_{name}')} "
-                f"ON {self.quote(table.name)} ({self.quote(name)})"
+                f"CREATE INDEX {guard}{self.quote(name)} "
+                f"ON {self.quote(table.name)} ({self.quote(column)})"
             )
 
         return statements
 
+    def existing_indexes(self, table_name: str) -> set[str]:
+        """Indexes already on a table.
+
+        Only needed by an engine without ``CREATE INDEX IF NOT EXISTS``; the others let the
+        server decide and return nothing here.
+        """
+        return set()
+
+    def table_ddl(self, table: Table) -> list[str]:
+        """Everything needed to bring one table into being, in order."""
+        return [self.create_table_ddl(table), *self.index_ddl(table)]
+
     def create_schema(self) -> None:
+        # Indexes are created after their table rather than alongside it, because an engine
+        # that cannot say IF NOT EXISTS has to ask the server what is already there
         for table in schema.TABLES:
-            for statement in self.table_ddl(table):
+            self.execute(self.create_table_ddl(table))
+            for statement in self.index_ddl(table):
                 self.execute(statement)
         self.seed()
         self.commit()
@@ -330,6 +440,57 @@ class Adapter(ABC):
         return rows[0][0] or 0
 
 
-def _slug(expression: str) -> str:
-    """Turn a column name or expression into something usable inside an index name."""
-    return "".join(c if c.isalnum() else "_" for c in expression).strip("_").lower()
+def _slug(part) -> str:
+    """Turn a key part into something usable inside an index name."""
+    if isinstance(part, NullSafe):
+        return f"{part.column}_or_null".lower()
+    return "".join(c if c.isalnum() else "_" for c in part).strip("_").lower()
+
+
+def _json_equal(stored: Any, incoming: Any) -> bool:
+    """Compare two JSON documents by what they say, not by how they are written.
+
+    A native JSON column hands back its own normal form -- PostgreSQL's ``jsonb`` reorders keys
+    and rewrites numbers, MySQL's ``JSON`` drops insignificant whitespace -- so the text that
+    comes out is rarely the text that went in even when nothing has changed.
+    """
+    return _as_json(stored) == _as_json(incoming)
+
+
+def _as_json(value: Any) -> Any:
+    if value is None or isinstance(value, (dict, list)):
+        return value
+    if isinstance(value, (bytes, bytearray)):
+        value = value.decode("utf-8", "replace")
+    if isinstance(value, str):
+        try:
+            return jsonlib.loads(value)
+        except ValueError:
+            return value
+    return value
+
+
+def _instant_equal(stored: Any, incoming: Any) -> bool:
+    """Compare two instants across the forms the engines store them in.
+
+    SQLite keeps Unix seconds and the others keep a native timestamp, so a comparison can find
+    an int on one side and a datetime on the other -- when reading a database written by an
+    older version of this tool, or simply when the driver returns naive local time for a column
+    written as UTC.
+    """
+    left, right = _epoch(stored), _epoch(incoming)
+    return left is not None and left == right
+
+
+def _epoch(value: Any) -> int | None:
+    from datetime import datetime, timezone
+
+    if isinstance(value, bool):
+        return None
+    if isinstance(value, (int, float)):
+        return int(value)
+    if isinstance(value, datetime):
+        if value.tzinfo is None:
+            value = value.replace(tzinfo=timezone.utc)
+        return int(value.timestamp())
+    return None

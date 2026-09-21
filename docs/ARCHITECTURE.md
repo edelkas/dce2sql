@@ -42,6 +42,7 @@ assert the resulting databases are identical.
 | `util.py` | Snowflakes, colours, timestamps, hashing |
 | `schema.py` | The schema, declared once as metadata |
 | `adapters/` | One class per engine, DDL rendered from the schema |
+| `adapters/server.py` | What MySQL and PostgreSQL share and SQLite does not |
 | `importer.py` | The per-file pipeline and the merge policy |
 | `cli.py`, `progress.py`, `stats.py` | The command, the status bar, the report |
 
@@ -168,6 +169,11 @@ have a Discord snowflake. The ones that do not:
 | Junction rows | their full column tuple |
 | Standard emoji | their shortcode, with a synthetic ID below 2³² that cannot collide with a snowflake |
 
+A unique constraint containing a nullable column is declared over a `COALESCE` of it, because
+every engine treats NULLs as distinct inside a unique index and would fail to deduplicate
+exactly the rows a re-import doubles. The stand-in takes the column's own type, which is the
+adapter's business — zero is not a timestamp.
+
 `imports` is the deliberate exception: one row per file read, never deduplicated, because the
 row is the evidence that the import happened.
 
@@ -186,13 +192,40 @@ channel that no longer exists. Constraints would turn all of those into import f
 Adapters render DDL from that rather than keeping their own `CREATE TABLE` scripts, so an engine
 cannot drift from the schema the importer writes against.
 
-An adapter supplies the type map, the parameter style, the auto-increment keyword and the
-spellings of "insert unless it's already there" and "insert or update". Everything else —
-batched selects, inserts, updates, index creation — is shared. Adding MySQL or PostgreSQL is a
-file of about fifty lines.
+An adapter supplies the type map, the parameter style, the auto-increment spelling and the two
+forms of "insert unless it's already there". Everything else — batched selects, inserts,
+updates, index creation — is shared. `Importer` takes the adapter as a constructor argument, so
+a subclass can be injected without touching anything else.
 
-`Importer` takes the adapter as a constructor argument, so a subclass can be injected without
-touching anything else.
+### What the servers made us fix
+
+SQLite is forgiving in ways that hide mistakes, and pointing the same schema at MySQL and
+PostgreSQL turned three of them up immediately:
+
+- **`COALESCE(timestamp, 0)`** — the sentinel that makes a NULL-tolerant unique index work. Fine
+  where a timestamp *is* an integer; a type error where it is a real date. The sentinel is now
+  the adapter's business, so it can have the column's own type (`to_timestamp(0)` in PostgreSQL,
+  a literal in MySQL — both immutable, as an index expression has to be).
+- **`emoji_id INT`** holding a Discord snowflake. SQLite's `INTEGER` is 8 bytes whatever the
+  declaration says, so it never complained; MySQL rejected the value outright. Every column
+  ending in `_id` is now 8 bytes, with a test asserting it.
+- **Neither fixture had a components tree or a forward**, so the two JSON-valued columns had
+  never actually been round-tripped. They are now, on every engine.
+
+### Values, and why comparison has to know the engine
+
+The merge policy rests on asking "has this actually changed?", and the engines disagree about
+what a value *is*. SQLite has no boolean and no timestamp, so both are integers, and JSON is
+text. MySQL and PostgreSQL have all three natively — which SQL.md asks for — and a native type
+hands back its own normal form: `JSONB` reorders keys, a timestamp returns as a `datetime`.
+
+So `encode` maps a Python value into the engine's world and `differs` compares within it,
+treating as equal a JSON document that only got reordered and an instant that arrived in a
+different form. Without that, every row would read as an edit on every run.
+
+The tests reduce both sides back to one canonical form, which lets the same assertions run
+against any engine — and lets the strongest one be stated at all: the same exports imported
+into SQLite, MySQL and PostgreSQL produce the same archive.
 
 ## What a merged export cannot say
 
@@ -236,3 +269,10 @@ the N++ server, and are worth repeating after any change to the merge policy:
 - **A 129 MiB export** through the streaming reader: imported at ~2,100 messages/second with a
   peak Python allocation of **9 MiB**, against the ~1.3 GiB that parsing it outright would have
   cost.
+- **That same thirty-channel export into all three engines**, against MySQL 8 and PostgreSQL 16
+  in throwaway containers. 11,961 rows each, identical across the three. Throughput was ~3,100
+  messages/second on SQLite, ~1,300 on PostgreSQL and ~1,100 on MySQL.
+
+The server suite in `tests/test_server_engines.py` runs whenever `DCE2SQL_TEST_MYSQL` or
+`DCE2SQL_TEST_POSTGRES` names a scratch database, and skips otherwise. It drops and recreates
+what it is pointed at, so point it at something disposable.

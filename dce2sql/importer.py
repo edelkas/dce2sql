@@ -45,7 +45,6 @@ from .util import (
     chunked,
     color,
     discriminator,
-    same_url,
     snowflake,
     timestamp,
 )
@@ -926,7 +925,8 @@ class Importer:
             changed = {
                 c: v
                 for c, v in encoded.items()
-                if c not in insert_only and _differs(table.column(c), row[index[c]], v)
+                if c not in insert_only
+                and self.db.differs(table.column(c), row[index[c]], v)
             }
             if not changed:
                 continue
@@ -959,20 +959,6 @@ class Importer:
 # --------------------------------------------------------------------------------------
 # Record builders
 # --------------------------------------------------------------------------------------
-
-
-def _differs(column, stored, incoming) -> bool:
-    """Whether a value has really changed, as opposed to merely being written again.
-
-    The one case where those come apart is a Discord CDN link: it is signed per export and
-    expires within a day, so re-exporting the same archive would otherwise rewrite every
-    attachment row and leave `updated_at` meaning nothing.
-    """
-    if stored == incoming:
-        return False
-    if column.signed_url and same_url(stored, incoming):
-        return False
-    return True
 
 
 def _data_columns(table: Table) -> list[str]:

@@ -8,7 +8,10 @@ Two conventions, both from SQL.md:
 
 * Tables that map to real Discord objects use Discord's own 8-byte ID as the primary key and
   carry ``created_at``/``updated_at``.  Everything else auto-increments.
-* Any column whose name ends in ``_id`` is a reference and gets an index, as does any timestamp.
+* Any column whose name ends in ``_id`` is a reference: it gets an index, and it is declared
+  as an 8-byte ``ID`` whether it points at a Discord snowflake or at an auto-assigned key.
+  SQLite hides a mistake here, since its INTEGER is 8 bytes whatever the declaration says; the
+  other engines do not, and a truncated snowflake would be silent and unrecoverable.
 
 References are **not** enforced with foreign keys.  An archive routinely points outside itself:
 a reply whose parent predates the export range, a sticker whose guild was never exported, a
@@ -49,9 +52,9 @@ class Column:
 class Table:
     name: str
     columns: tuple[Column, ...]
-    #: Column tuples that must be unique.  A name may be wrapped in an expression -- see
-    #: NULL_SAFE below for why some of them have to be.
-    unique: tuple[tuple[str, ...], ...] = ()
+    #: Column tuples that must be unique.  A part may be a plain column name, or a
+    #: :class:`NullSafe` wrapper around one -- see that class for why some of them have to be.
+    unique: tuple[tuple, ...] = ()
     comment: str = ""
 
     def column(self, name: str) -> Column:
@@ -122,13 +125,21 @@ def _seed(name: str, comment: str) -> Table:
     )
 
 
-#: SQLite, MySQL and PostgreSQL all treat NULLs as distinct inside a UNIQUE index, so a unique
-#: constraint containing a nullable column cannot deduplicate the rows where it *is* NULL --
-#: precisely the rows a re-import would otherwise double.  Wrapping the column makes the
-#: constraint do what it reads as.  Zero is safe as the stand-in: no Discord ID is ever 0
-#: except the synthetic "Direct Messages" guild, which never appears in these positions.
-def NULL_SAFE(column: str) -> str:
-    return f"COALESCE({column}, 0)"
+@dataclass(frozen=True)
+class NullSafe:
+    """A unique-constraint key part that treats NULL as a value.
+
+    SQLite, MySQL and PostgreSQL all treat NULLs as *distinct* inside a unique index, so a
+    constraint containing a nullable column cannot deduplicate the rows where it is NULL --
+    precisely the rows a re-import would otherwise double.  Substituting a sentinel makes the
+    constraint do what it reads as.
+
+    What the sentinel *is* has to be left to the adapter, because it has to have the column's
+    own type: zero serves for an ID or a count, but a timestamp column is a real date on the
+    engines that have one, and ``COALESCE(timestamp, 0)`` is a type error there.
+    """
+
+    column: str
 
 
 # ------------------------------------------------------------------------------------------
@@ -256,7 +267,7 @@ MESSAGE_HISTORY = _aux(
     Column("message_id", ID, null=False),
     Column("timestamp", TS),
     Column("content", TEXT),
-    unique=(("message_id", NULL_SAFE("timestamp")),),
+    unique=(("message_id", NullSafe("timestamp")),),
     comment="Superseded message contents, so an edit seen by a later export loses nothing.",
 )
 
@@ -271,14 +282,14 @@ EMBEDS = _aux(
     Column("description", TEXT),
     Column("timestamp", TS),
     Column("color", INT),
-    Column("thumbnail_id", INT),
+    Column("thumbnail_id", ID),
     Column("author_name", STR, size=256),
     Column("author_url", STR, size=1024),
-    Column("author_icon_id", INT),
-    Column("image_id", INT),
-    Column("video_id", INT),
+    Column("author_icon_id", ID),
+    Column("image_id", ID),
+    Column("video_id", ID),
     Column("footer", STR, size=2048),
-    Column("footer_icon_id", INT),
+    Column("footer_icon_id", ID),
     Column("fields", JSON),
     unique=(("message_id", "ordinal"),),
     comment="Message embeds, flattened. Rich images and videos go to 'resources'.",
@@ -286,7 +297,7 @@ EMBEDS = _aux(
 
 RESOURCES = _aux(
     "resources",
-    Column("embed_id", INT, null=False),
+    Column("embed_id", ID, null=False),
     # Which of the embed's slots this filled: thumbnail, image, video, author_icon, footer_icon,
     # or images[n]. Gives a re-import something to match on, and says what the row meant.
     Column("slot", STR, null=False, size=32),
@@ -334,12 +345,12 @@ REACTIONS = _aux(
     "reactions",
     Column("message_id", ID, null=False),
     Column("user_id", ID),
-    Column("emoji_id", INT, null=False),
+    Column("emoji_id", ID, null=False),
     # 1 on a row that names its reacting user. When the export was made without fetching the
     # user list, a single row stands in for the whole reaction with the total here and a NULL
     # user, so SUM(count) per (message_id, emoji_id) is the true total in either case.
     Column("count", INT, null=False, default=1),
-    unique=(("message_id", "emoji_id", NULL_SAFE("user_id")),),
+    unique=(("message_id", "emoji_id", NullSafe("user_id")),),
     comment="Who reacted with what, or how many did when the names weren't exported.",
 )
 
@@ -354,9 +365,9 @@ MENTIONS = _aux(
 MESSAGE_EMOJIS = _aux(
     "message_emojis",
     Column("message_id", ID, null=False),
-    Column("emoji_id", INT, null=False),
-    Column("embed_id", INT),
-    unique=(("message_id", "emoji_id", NULL_SAFE("embed_id")),),
+    Column("emoji_id", ID, null=False),
+    Column("embed_id", ID),
+    unique=(("message_id", "emoji_id", NullSafe("embed_id")),),
     comment="Emoji used in a message's content, or inside one of its embeds.",
 )
 
