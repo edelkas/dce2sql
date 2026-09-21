@@ -151,7 +151,30 @@ class Adapter(ABC):
         return value
 
     def encode_row(self, table: Table, columns: Sequence[str], row: Sequence) -> tuple:
-        return tuple(self.encode(table.column(c), v) for c, v in zip(columns, row))
+        return tuple(
+            self.check_length(table, table.column(c), self.encode(table.column(c), v))
+            for c, v in zip(columns, row)
+        )
+
+    def check_length(self, table: Table, column: Column, value: Any) -> Any:
+        """Refuse a value too long for its column, saying which and by how much.
+
+        The engines report this as ``Data too long for column 'url' at row 1``, which names
+        neither the table, the limit, nor the value -- and "row 1" means the first row of a
+        thousand-row batch, not of the file.  Finding out what actually happened meant walking
+        the export by hand.  Failing here instead costs one comparison per value and says
+        everything needed to act.
+
+        It fails rather than truncating, because a truncated URL or name is worse than a
+        missing file: it looks like data.  The file is reported and skipped, and the rest of
+        the run carries on.
+        """
+        if column.size is None or not isinstance(value, str) or len(value) <= column.size:
+            return value
+        raise ValueError(
+            f"{table.name}.{column.name} holds at most {column.size} characters, "
+            f"but this export has one of {len(value)}: {value[:80]}..."
+        )
 
     # -- comparison --------------------------------------------------------------------
 

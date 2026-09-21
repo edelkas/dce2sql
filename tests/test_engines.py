@@ -113,6 +113,75 @@ class TestDdl:
         assert has_guard == adapter.supports_index_if_not_exists
 
 
+class TestBounds:
+    """Which columns have a length limit, and which must not.
+
+    A real export turned up an ``embeds.url`` of 1,995 characters: a Discord CDN link with an
+    essay appended as a ``?comment=`` parameter. Every VARCHAR width is a guess, and for a URL
+    there is nothing to guess from -- it is whatever somebody typed into a message.
+    """
+
+    #: Every column holding a URL. None of them may be bounded.
+    URL_COLUMNS = [
+        ("guilds", "url"), ("guilds", "icon"), ("guilds", "banner"), ("guilds", "splash"),
+        ("users", "avatar"), ("users", "banner"),
+        ("members", "avatar"), ("members", "banner"),
+        ("attachments", "url"), ("emojis", "url"), ("stickers", "url"),
+        ("embeds", "url"), ("embeds", "author_url"),
+        ("resources", "url"), ("resources", "proxied_url"),
+    ]
+
+    @pytest.mark.parametrize("table,column", URL_COLUMNS)
+    def test_a_url_column_is_never_bounded(self, table, column):
+        assert schema.BY_NAME[table].column(column).size is None
+
+    @pytest.mark.parametrize("table,column", URL_COLUMNS)
+    def test_and_renders_as_unbounded_text(self, adapter, table, column):
+        rendered = adapter.column_type(schema.BY_NAME[table].column(column))
+        assert "VARCHAR" not in rendered, f"{table}.{column} is {rendered}"
+
+    def test_every_remaining_bound_is_one_discord_itself_enforces(self):
+        """A bounded column has to be bounded by the platform, not by our guess at it.
+
+        Listed explicitly so that adding a bounded column is a decision rather than an
+        oversight -- the one that let a 1,995-character URL into a VARCHAR(1024).
+        """
+        expected = {
+            # Discord's own limits
+            ("guilds", "name"): 100, ("channels", "name"): 100, ("roles", "name"): 100,
+            ("users", "name"): 32, ("users", "display"): 32, ("members", "display"): 32,
+            ("emojis", "name"): 64, ("emojis", "code"): 64,
+            ("stickers", "name"): 30, ("interactions", "name"): 100,
+            ("attachments", "name"): 255,
+            ("embeds", "title"): 256, ("embeds", "author_name"): 256,
+            ("embeds", "footer"): 2048,
+            # Ours, and short by construction
+            ("stickers", "format"): 16, ("resources", "slot"): 32,
+            ("imports", "sha1"): 40, ("imports", "kind"): 16,
+            ("channel_types", "name"): 64, ("message_types", "name"): 64,
+            ("reference_types", "name"): 64,
+        }
+        found = {
+            (t.name, c.name): c.size or 255
+            for t in schema.TABLES
+            for c in t.columns
+            if c.type == schema.STR
+        }
+        assert found == expected
+
+    def test_an_overflow_says_which_column_and_by_how_much(self, adapter):
+        """The engines say "Data too long for column 'url' at row 1" and nothing more."""
+        with pytest.raises(ValueError) as caught:
+            adapter.encode_row(schema.USERS, ("id", "name"), (1, "x" * 40))
+
+        message = str(caught.value)
+        assert "users.name" in message
+        assert "at most 32" in message and "of 40" in message
+
+    def test_a_value_within_its_bound_passes_through(self, adapter):
+        assert adapter.encode_row(schema.USERS, ("name",), ("x" * 32,)) == ("x" * 32,)
+
+
 class TestIdentifiers:
     def test_each_engine_quotes_its_own_way(self):
         assert ADAPTERS["sqlite"].quote("select") == '"select"'

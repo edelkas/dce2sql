@@ -344,6 +344,58 @@ class TestRichJson:
         assert not problems, chr(10).join(problems)
 
 
+class TestLongValues:
+    def test_a_url_far_longer_than_any_limit_survives(self, tmp_path):
+        """From a real export: a CDN link with an essay appended as a ?comment= parameter."""
+        monstrous = (
+            "https://cdn.discordapp.com/attachments/1/2/a.gif?comment="
+            + "why_would_anyone_do_this_" * 100
+        )
+        assert len(monstrous) > 2000
+
+        def give_it_an_embed(document):
+            document["messages"][0]["embeds"] = [
+                {"title": "", "url": monstrous, "timestamp": None, "description": "",
+                 "images": [], "fields": [], "inlineEmojis": []}
+            ]
+
+        path = _doctor(tmp_path, "ext.json", give_it_an_embed, "monstrous.json")
+        db = tmp_path / "archive.db"
+        import_files(db, path)
+
+        stored = rows(db, "SELECT url FROM embeds WHERE ordinal = 0 ORDER BY LENGTH(url) DESC")
+        assert stored[0][0] == monstrous, "stored whole, not truncated"
+
+    def test_an_over_long_bounded_value_fails_the_file_and_says_why(self, tmp_path):
+        """Failing beats truncating: a truncated name looks like data."""
+        from dce2sql.adapters import create
+        from dce2sql.documents import Document
+        from dce2sql.importer import Importer
+        from dce2sql.reader import Source, open_document
+
+        def absurd_name(document):
+            document["messages"][0]["author"]["name"] = "n" * 40
+
+        path = _doctor(tmp_path, "ext.json", absurd_name, "absurd.json")
+        db = tmp_path / "archive.db"
+
+        adapter = create("sqlite", str(db))
+        adapter.connect()
+        try:
+            adapter.create_schema()
+            source = Source.of(path)
+            result = Importer(adapter).import_document(
+                Document(open_document(source)), source
+            )
+        finally:
+            adapter.close()
+
+        assert result.error is not None
+        assert "users.name" in result.error and "at most 32" in result.error
+        # ...and the file was rolled back rather than half-written
+        assert rows(db, "SELECT COUNT(*) FROM messages") == [(0,)]
+
+
 class TestVolatileUrls:
     def test_a_re_signed_attachment_url_is_not_an_edit(self, tmp_path):
         """Discord signs CDN links per export, with a signature that expires within a day.

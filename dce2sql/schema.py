@@ -29,8 +29,17 @@ INT = "int"
 BOOL = "bool"
 TS = "ts"  # instant; native type where available, Unix seconds otherwise
 STR = "str"  # short, bounded; VARCHAR where available
-TEXT = "text"  # potentially long
+TEXT = "text"  # potentially long, or of no knowable length -- see URL below
 JSON = "json"  # native JSON column where available, serialized string otherwise
+
+
+#: A URL.  Stored as TEXT rather than a bounded VARCHAR, which is a deliberate departure from
+#: SQL.md's "names or URLs are short strings": a URL in an embed is whatever somebody typed into
+#: a message, so its only real limit is Discord's 4,000-character message body, and one found in
+#: the wild ran to 1,995 characters (a CDN link with an essay appended as a ?comment= parameter).
+#: Everything else bounded here is bounded by Discord itself -- a username is 32 characters
+#: because Discord will not accept a 33rd -- and those stay VARCHAR.
+URL = TEXT
 
 
 @dataclass(frozen=True)
@@ -150,10 +159,10 @@ GUILDS = _base(
     "guilds",
     Column("name", STR, size=100),
     Column("description", TEXT),
-    Column("url", STR, size=255),
-    Column("icon", STR, size=512),
-    Column("banner", STR, size=512),
-    Column("splash", STR, size=512),
+    Column("url", URL),
+    Column("icon", URL),
+    Column("banner", URL),
+    Column("splash", URL),
     Column("boost_level", INT),
     Column("boost_count", INT),
     Column("owner_id", ID),
@@ -181,8 +190,8 @@ USERS = _base(
     Column("discriminator", INT),
     Column("display", STR, size=32, index=True),
     Column("bot", BOOL, index=True),
-    Column("avatar", STR, size=512),
-    Column("banner", STR, size=512),
+    Column("avatar", URL),
+    Column("banner", URL),
     Column("deleted", BOOL, null=False, default=False),
     comment="Discord accounts, global. Guild-specific profiles live in 'members'.",
 )
@@ -210,7 +219,7 @@ ATTACHMENTS = _base(
     Column("message_id", ID),
     Column("name", STR, size=255),
     Column("size", INT),
-    Column("url", STR, size=1024, signed_url=True),
+    Column("url", URL, signed_url=True),
     comment="Files uploaded with a message. Discord does not deduplicate these.",
 )
 
@@ -229,7 +238,7 @@ EMOJIS = _base(
     Column("name", STR, size=64, index=True),
     Column("code", STR, size=64, index=True),
     Column("animated", BOOL),
-    Column("url", STR, size=512),
+    Column("url", URL),
     comment=(
         "Custom emoji keyed by their Discord ID; standard Unicode emoji have none, so they get "
         "a low synthetic ID that cannot collide with a snowflake, and a NULL guild."
@@ -241,7 +250,7 @@ STICKERS = _base(
     Column("guild_id", ID),
     Column("name", STR, size=30),
     Column("format", STR, size=16),
-    Column("url", STR, size=512),
+    Column("url", URL),
     comment="Stickers. 'guild_id' is only recoverable from an extended export's inventory.",
 )
 
@@ -278,13 +287,13 @@ EMBEDS = _aux(
     # in the message's array is the only stable identity available for a re-import to match on
     Column("ordinal", INT, null=False),
     Column("title", STR, size=256),
-    Column("url", STR, size=1024),
+    Column("url", URL),
     Column("description", TEXT),
     Column("timestamp", TS),
     Column("color", INT),
     Column("thumbnail_id", ID),
     Column("author_name", STR, size=256),
-    Column("author_url", STR, size=1024),
+    Column("author_url", URL),
     Column("author_icon_id", ID),
     Column("image_id", ID),
     Column("video_id", ID),
@@ -301,8 +310,8 @@ RESOURCES = _aux(
     # Which of the embed's slots this filled: thumbnail, image, video, author_icon, footer_icon,
     # or images[n]. Gives a re-import something to match on, and says what the row meant.
     Column("slot", STR, null=False, size=32),
-    Column("url", STR, size=1024, signed_url=True),
-    Column("proxied_url", STR, size=1024, signed_url=True),
+    Column("url", URL, signed_url=True),
+    Column("proxied_url", URL, signed_url=True),
     Column("width", INT),
     Column("height", INT),
     unique=(("embed_id", "slot"),),
@@ -323,8 +332,8 @@ MEMBERS = Table(
         Column("guild_id", ID, null=False),
         Column("display", STR, size=32, index=True),
         Column("color", INT),
-        Column("avatar", STR, size=512),
-        Column("banner", STR, size=512),
+        Column("avatar", URL),
+        Column("banner", URL),
         Column("joined_at", TS),
         Column("boosting_since", TS),
         *_timestamps(),

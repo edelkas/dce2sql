@@ -212,6 +212,13 @@ PostgreSQL turned three of them up immediately:
 - **Neither fixture had a components tree or a forward**, so the two JSON-valued columns had
   never actually been round-tripped. They are now, on every engine.
 
+A fourth came from a real archive rather than from the servers, but belongs to the same family
+of "SQLite let it through": **`embeds.url VARCHAR(1024)` against a 1,995-character URL**. Every
+VARCHAR width in the schema was a guess at a Discord limit, and for a URL there is no limit to
+guess at — an embed's URL is whatever somebody typed into a message. All URL columns are now
+unbounded text, and a test lists the bounded columns explicitly so that adding one is a
+decision rather than an oversight.
+
 ### Values, and why comparison has to know the engine
 
 The merge policy rests on asking "has this actually changed?", and the engines disagree about
