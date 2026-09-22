@@ -457,8 +457,11 @@ The `imports` table stores information about each JSON export file imported into
 | total_message_count | Integer | Number of messages in the export |
 | new_message_count | Integer | Number of messages that weren't already in the database when importing the file |
 | edit_message_count | Integer | Number of messages that were already in the database, but had changed |
+| unresolved | Boolean | Whether resolved mentions in this file's bodies were put back into their raw form |
 
 A member export has no channel and no date range, so those columns are NULL for it and `total_message_count` holds the roster size instead; `kind` says which of the two a row describes.
+
+The `unresolved` flag is worth recording because it changes what the `content` column holds. DCE resolves mentions into names before writing a body, so a renamed channel or a changed nickname alters the text of messages nobody edited; importing with `--unresolve` puts those back into the `<@123>` form Discord actually stores, which is stable. A row says whether that was done, so a body can always be read in the light of how it was stored.
 
 Note that some of the fields come directly from the JSON exports, such as the `channel_id` (which comes from `channel['id']` in the JSON), the first 2 timestamps (which come from the `dateRange` object), the `exported_at` timestamp (which comes from `exportedAt`) or the `total_message_count` (which comes from `messageCount`).
 

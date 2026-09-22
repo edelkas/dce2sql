@@ -80,7 +80,8 @@ The `mod` object is written by the fork on every export, and says which of its o
   "extended": Boolean,
   "splitUsers": Boolean,
   "reactionUsers": Boolean,
-  "cache": Boolean
+  "cache": Boolean,
+  "markdown": Boolean
 }
 ```
 
@@ -91,10 +92,13 @@ The `mod` object is written by the fork on every export, and says which of its o
 | `splitUsers` | User and member were written as two objects. See [User object](#user-object). |
 | `reactionUsers` | The reacting users were fetched. When false, every reaction's `users` array is empty although its `count` is not. |
 | `cache` | Member data may come from a cross-run cache, and so may be up to the cache's TTL out of date. |
+| `markdown` | Whether mentions, custom emoji and timestamps in message bodies were resolved into names. See below. |
 
 Keys are added over time, so an export made before a given option existed simply lacks its key. Absent should be read as false, with one exception: `reactionUsers` defaults to **true**, because before the flag existed there was no way for the users not to be fetched.
 
 A member export (see [Member export](#member-export)) writes a smaller `mod` object with a different key, `fullUsers`.
+
+`markdown` is the one key here that is not a fork option — it mirrors DCE's own `--markdown`, which defaults to on. It matters more than its name suggests. With it on, a message body has five things resolved into text: user mentions become `@Nickname`, channel mentions `#channel-name`, role mentions `@Role Name`, custom emoji `:shortcode:`, and `<t:...>` timestamps a locale-formatted date. Every one of those is resolved against something that can change later, so the same message exported twice can differ although nobody edited it. With markdown off the bodies keep the raw `<@123>` form, which is stable and strictly more informative. For an archive, off is the right setting; this key is how a consumer knows which it is looking at.
 
 ## Normalized output
 

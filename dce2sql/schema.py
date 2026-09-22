@@ -408,6 +408,9 @@ IMPORTS = _aux(
     Column("total_message_count", INT),
     Column("new_message_count", INT),
     Column("edit_message_count", INT),
+    # Whether resolved mentions in this file's message bodies were put back into their raw
+    # form on the way in. It changes what is stored, so the archive should say so.
+    Column("unresolved", BOOL, null=False, default=False),
     comment=(
         "One row per file imported, deliberately never deduplicated: re-importing the same "
         "file is a no-op everywhere else, and the row is the evidence that it happened."

@@ -92,6 +92,44 @@ def open_document(
     return RawDocument(source, header, array_key, lambda: _stream_items(source.path, array_key))
 
 
+def peek(source: Source, keys=("guild", "channel")) -> dict:
+    """Read just the named top-level keys of an export, and stop.
+
+    Used to survey a whole run before importing any of it -- which channels existed and what
+    they were called at the time -- without paying to parse every file twice.  Those keys sit
+    at the very start of the document, so this costs a few kilobytes per file however large it
+    is.
+    """
+    import ijson
+
+    wanted = set(keys)
+    out: dict = {}
+
+    with source.path.open("rb") as handle:
+        events = ijson.basic_parse(handle, buf_size=1 << 15)
+
+        event, _ = next(events, ("", None))
+        if event != "start_map":
+            return out
+
+        key = None
+        for event, value in events:
+            if event == "map_key":
+                key = value
+            elif event == "end_map" and key is None:
+                break
+            elif key in wanted:
+                out[key] = _consume_value(events, event, value)
+                key = None
+                if wanted <= set(out):
+                    break
+            else:
+                _skip_value(events, event)
+                key = None
+
+    return out
+
+
 def array_key_of(document: dict) -> str:
     """Decide which array a document is built around, given its top-level keys.
 

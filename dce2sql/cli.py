@@ -13,8 +13,9 @@ from . import __version__
 from .adapters import DEFAULT_ENGINE, ENGINES, create, parse_url
 from .documents import Document
 from .importer import Importer
+from .mentions import ChannelIndex, Unresolver
 from .progress import ImportProgress
-from .reader import Source, open_document
+from .reader import Source, open_document, peek
 from .stats import FileStats, Stats, render
 
 #: Extensions considered when a directory is given as a source.
@@ -110,6 +111,30 @@ def build_parser() -> argparse.ArgumentParser:
         metavar="N",
         help="messages to buffer before writing a batch (default: 500)",
     )
+    content = parser.add_argument_group(
+        "message content",
+        "DCE resolves mentions into names before writing them, so a renamed channel or "
+        "nickname makes old messages look edited. Export with '--markdown false' to avoid "
+        "this; use these to repair exports already made.",
+    )
+    content.add_argument(
+        "--unresolve",
+        action="store_true",
+        help=(
+            "put resolved mentions back into their raw '<@123>' form before importing, so "
+            "that a later rename cannot make an unchanged message look edited"
+        ),
+    )
+    content.add_argument(
+        "--channels",
+        default=None,
+        metavar="FILE",
+        help=(
+            "output of DCE's 'channels' command, naming every channel in the server. "
+            "Only useful with --unresolve, and the best source it has for channel mentions"
+        ),
+    )
+
     parser.add_argument(
         "--stop-on-error",
         action="store_true",
@@ -254,6 +279,10 @@ def main(argv: list[str] | None = None) -> int:
         console.print(f"\n{len(sources)} file(s), {_size(total)}")
         return 0
 
+    if args.channels and not args.unresolve:
+        console.print("[red]--channels only does something with --unresolve.[/red]")
+        return 1
+
     if args.batch_size:
         from . import importer as importer_module
 
@@ -271,12 +300,75 @@ def main(argv: list[str] | None = None) -> int:
         else:
             failed = _import(args, connection, sources, stats, progress)
 
+    stats.unresolver = _UNRESOLVER[0]
+
     stats.seconds = time.time() - started
 
     if not args.quiet:
         render(stats, console=Console(), dry_run=args.dry_run)
 
     return 1 if failed else 0
+
+
+#: Set by the run so the closing report can say what the unresolver managed. A module global
+#: because it is built inside _import and read after it, and threading it back out through the
+#: return value would mean changing what every other caller expects.
+_UNRESOLVER: list = [None]
+
+
+def build_unresolver(args, sources, adapter, progress) -> Unresolver:
+    """Survey every channel the run could possibly be talking about, before importing any of it.
+
+    A message body says ``#general``; only a name-to-ID map turns that back into ``<#123>``.
+    No single source has all of them, so three are pooled, in the order their names are most
+    likely to be the ones in force when the bodies were written:
+
+    1. the exports being imported -- each knows its own channel and its parent, named as they
+       were at the time, which is exactly the vintage wanted;
+    2. a ``channels`` listing, which knows every channel in the server but only as of whenever
+       it was run;
+    3. the database, which knows everything ever seen.
+
+    The first to claim a name keeps it. Reading the exports costs a few kilobytes each rather
+    than a full parse, because the channel sits at the very top of the document.
+    """
+    index = ChannelIndex()
+
+    for source in sources:
+        try:
+            index.add_export_header(peek(source))
+        except Exception:  # noqa: BLE001 -- a file that cannot be peeked will fail properly later
+            continue
+
+    if args.channels:
+        try:
+            index.add_listing(args.channels)
+        except OSError as exc:
+            progress.log(f"[yellow]could not read {args.channels}:[/yellow] {exc}")
+
+    try:
+        index.add_database(
+            adapter.fetchall(
+                f"SELECT {adapter.quote('id')}, {adapter.quote('name')}, "
+                f"{adapter.quote('type')} FROM {adapter.quote('channels')}"
+            )
+        )
+    except Exception:  # noqa: BLE001 -- an empty or brand new database simply has none
+        pass
+
+    unresolver = Unresolver(index)
+    try:
+        unresolver.add_roles(
+            {"id": i, "name": n}
+            for i, n in adapter.fetchall(
+                f"SELECT {adapter.quote('id')}, {adapter.quote('name')} "
+                f"FROM {adapter.quote('roles')}"
+            )
+        )
+    except Exception:  # noqa: BLE001
+        pass
+
+    return unresolver
 
 
 def _import(
@@ -297,8 +389,22 @@ def _import(
         adapter.create_schema()
         importer = Importer(adapter, stats, progress)
 
+        unresolver = None
+        if args.unresolve:
+            unresolver = build_unresolver(args, sources, adapter, progress)
+            _UNRESOLVER[0] = unresolver
+            # Roles are pooled as each file is read, so only the channel survey -- the part
+            # that had to happen up front -- can be reported here
+            sources_of = ", ".join(
+                f"{n:,} from {where}" for where, n in unresolver.channels.sources.most_common()
+            )
+            progress.log(
+                f"[dim]Unresolving against {len(unresolver.channels):,} channel name(s): "
+                f"{sources_of or 'none found'}.[/dim]"
+            )
+
         for source in sources:
-            doc = _open(source, stats, progress)
+            doc = _open(source, stats, progress, unresolver)
             if doc is None:
                 if args.stop_on_error:
                     return True
@@ -455,9 +561,11 @@ def _count(doc: Document, fs: FileStats, stats: Stats, progress: ImportProgress)
     stats.insert("members", len(members))
 
 
-def _open(source: Source, stats: Stats, progress: ImportProgress) -> Document | None:
+def _open(
+    source: Source, stats: Stats, progress: ImportProgress, unresolver=None
+) -> Document | None:
     try:
-        return Document(open_document(source))
+        return Document(open_document(source), unresolver)
     except Exception as exc:  # noqa: BLE001
         progress.log(
             f"[red]unreadable[/red] {source.path}: {type(exc).__name__}: {exc}"

@@ -54,6 +54,9 @@ class Stats:
     #: Filled in by the CLI; see Adapter-side queries in cli.summarize.
     archive: dict = field(default_factory=dict)
 
+    #: The mention unresolver, when --unresolve was used, so the report can say what it managed
+    unresolver: object = None
+
     def record(self, file_stats: FileStats) -> None:
         self.per_file.append(file_stats)
         self.files += 1
@@ -111,6 +114,20 @@ def render(stats: Stats, console=None, dry_run: bool = False) -> None:
             f"  Users newly found deleted: {stats.users_deleted:,}"
             "  (their messages are reassigned by Discord, so the originals are kept)"
         )
+
+    if stats.unresolver is not None:
+        unresolver = stats.unresolver
+        console.print(
+            f"  Mentions put back: {unresolver.summary()}, matched against "
+            f"{len(unresolver.channels):,} channel and {len(unresolver.roles):,} role name(s)",
+            soft_wrap=True,
+        )
+        if unresolver.channels.collisions:
+            console.print(
+                f"  [yellow]{unresolver.channels.collisions:,} channel name(s) map to more "
+                f"than one ID[/yellow]; the earliest source seen won.",
+                soft_wrap=True,
+            )
 
     if stats.unknown_types:
         console.print()

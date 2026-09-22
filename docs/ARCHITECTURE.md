@@ -39,6 +39,7 @@ assert the resulting databases are identical.
 | `reader.py` | Get a document off disk, whole or streamed |
 | `documents.py` | Reduce any shape to one canonical form |
 | `enums.py` | DCE enum names → Discord's official values; the seed tables |
+| `mentions.py` | Turning resolved mentions back into `<@123>`, and knowing when not to |
 | `util.py` | Snowflakes, colours, timestamps, hashing |
 | `schema.py` | The schema, declared once as metadata |
 | `adapters/` | One class per engine, DDL rendered from the schema |
@@ -95,6 +96,60 @@ A merged object also does not say whether the person is a member at all. It is t
 when something could only have come from a member: a join date, a role, a name colour, a
 guild-served image, a boost date, or member flags. Getting this right is what keeps merged and
 split exports producing the same rows.
+
+## Mentions, and why a rename looks like an edit
+
+DCE resolves five things in a message body before writing it, and every one is resolved against
+something that can change afterwards: user mentions into nicknames, channel mentions into
+channel names, role mentions into role names, custom emoji into shortcodes, and `<t:…>`
+timestamps into locale-formatted dates.
+
+Rename a channel, re-export the year, and the body of every message that ever mentioned it is
+now different text. The merge policy compares content to decide whether a message changed, so
+it faithfully records hundreds of revisions in `message_history` that never happened — and the
+real edits are lost among them.
+
+Exporting with `--markdown false` avoids this entirely and is what an archive should use; the
+fork's `mod` block records which way an export was made, and `--unresolve` is skipped
+automatically for one that is already raw. For the exports already made, `mentions.py` inverts
+the resolution:
+
+| Kind | Recovered from | Reach |
+| --- | --- | --- |
+| User | the message's own `mentions` array | only names that message says it mentions |
+| Role | the guild's role inventory | the whole server |
+| Channel | a pooled name-to-ID index | the run's exports, a `channels` listing, the database |
+
+The channel index is the interesting one, because a name is only meaningful *as of some
+moment*. The exports being imported know their own channel and its parent as they were named at
+the time, which is precisely the vintage wanted; a `channels` listing knows every channel but
+only as of whenever it was run; the database knows everything ever seen but has been updating
+each channel's name to the latest one. First source to claim a name keeps it, so the
+contemporaneous name wins. Surveying the exports costs a few kilobytes each rather than a full
+parse, since the channel sits at the top of the document.
+
+### Timidity
+
+A tool that rewrites message bodies has to fear changing something it shouldn't far more than
+missing something it could have caught: a wrong substitution is indistinguishable from the real
+thing once it is stored. So the matching is guarded on both sides.
+
+- **Longest candidate first.** `@bob` must not be pulled out of `@bobby`, leaving `<@1>by`.
+- **No partial names.** A match may not be followed by a character that could have continued
+  the name — hyphens included for channels, so `#general-chat` is not `#general` plus text.
+- **No sigil mid-word.** `a@bob` is an e-mail address, not a mention.
+- **Users are scoped to the message.** A body is only ever rewritten to name somebody it
+  already says it mentions, so the server having a member called Bob does not endanger every
+  message that says "@bob".
+- **`@everyone` and `@here` are left alone**, which also means skipping Discord's everyone
+  *role* — it is literally named `@everyone`, and treating it as a role would produce
+  `@@everyone`.
+- **What DCE could not resolve is left too**: `@Unknown`, `#deleted-channel` and
+  `@deleted-role` carry no ID and nothing can be recovered from them.
+
+Some mentions are irreversible whatever is done, and that is expected rather than an error. The
+run reports what it put back so the figure can be sanity-checked, and `imports.unresolved`
+records that the bodies of that file were rewritten.
 
 ## Importing
 

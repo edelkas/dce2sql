@@ -830,6 +830,7 @@ class Importer:
             "total_message_count",
             "new_message_count",
             "edit_message_count",
+            "unresolved",
         )
         row = (
             source.sha1,
@@ -845,6 +846,7 @@ class Importer:
             fs.members if doc.is_roster else fs.messages,
             fs.new_messages,
             fs.edited_messages,
+            doc.unresolver is not None,
         )
         self.db.insert(schema.IMPORTS, columns, [row])
         self.stats.insert(schema.IMPORTS.name, 1)

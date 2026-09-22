@@ -19,6 +19,9 @@ losing what an earlier run saw.
   inserted, changed ones updated, and re-importing a file you already have changes nothing.
 - **Nothing is ever deleted.** An edit is recorded in `message_history` rather than overwriting
   what was there. A message's author survives the account behind it being deleted.
+- **A rename is not an edit.** DCE writes `#general` where the message said `<#123>`, so renaming
+  a channel changes the body of every message that ever mentioned it. `--unresolve` puts those
+  back before importing, so only real edits are recorded as edits.
 - **A poorer export never erases a richer one.** A field an export could not carry is left
   alone, so a vanilla file and an extended one can be imported in either order.
 - **Users and members kept apart.** The global account and its per-server profile go in
@@ -60,6 +63,8 @@ Quote patterns so dce2sql expands them rather than the shell.
 | `-l`, `--list` | List the files that would be processed, then exit |
 | `-n`, `--dry-run` | Parse and report what is in the exports, without touching the database |
 | `--batch-size N` | Messages buffered before each write (default: 500) |
+| `--unresolve` | Put resolved mentions back into their raw `<@123>` form before importing |
+| `--channels FILE` | Output of DCE's `channels` command, for resolving channel mentions |
 | `--stop-on-error` | Abort on the first failing file instead of reporting and going on |
 | `--no-progress` | Suppress the status bar |
 | `-q`, `--quiet` | Suppress the closing report as well |
@@ -99,6 +104,40 @@ WHERE m.timestamp >= strftime('%s', '2019-01-01')
   AND m.timestamp <  strftime('%s', '2020-01-01')
 GROUP BY u.id ORDER BY posts DESC LIMIT 10;
 ```
+
+## Keeping an archive from drifting
+
+DCE resolves mentions before writing a message body: `<@197765375503368192>` is written as
+`@Nickname`, `<#449367560878686208>` as `#channel-name`. Both are resolved against names that
+can change, so re-exporting the same conversation after a rename produces different text for
+messages nobody edited — and an importer has no way to tell those from the handful that really
+were edited.
+
+**The fix for exports you have yet to make** is to export with markdown off, which leaves the
+bodies in their raw form:
+
+```bash
+DiscordChatExporter.Cli export -t TOKEN -c CHANNEL -f Json --markdown false
+```
+
+**The fix for exports already made** is `--unresolve`, which puts the mentions back on the way
+in:
+
+```bash
+dce2sql archive.db 'exports/2019/*.json' --unresolve --channels channels-2019.txt
+```
+
+A user mention is recovered from the message's own `mentions` array, so a body is only ever
+rewritten to name somebody it already says it mentions. A role mention is recovered from the
+server's role list. A channel mention needs a name-to-ID map, pooled from the exports being
+imported, from a `channels` listing if you give one, and from the database — in that order, so
+that a name of the right vintage wins over a later one. Keeping a `channels` listing alongside
+each batch of exports is what makes this reliable.
+
+Mentions that cannot be recovered are left exactly as they are. That includes what DCE writes
+when it could not resolve one itself (`@Unknown`, `#deleted-channel`), and anything that merely
+looks like a mention — a bare `#hashtag`, an `@name` nobody was pinged by. The matching is
+deliberately cautious: it would rather miss one than rewrite something that was never a mention.
 
 ## Engines
 

@@ -1,0 +1,56 @@
+197792191827935232  | Info / announcements
+695702567790837881  | Info / giveaway
+197779975900758017  | Info / rules-and-info
+732651021368819884  | Chat / community-challenges
+1081289718685237248 | Chat / custom-tabs
+ * 1536837099548844062 | Thread / Action | Active
+ * 1081296223828451418 | Thread / Custom Tab Info | Active
+ * 1110998853634773073 | Thread / Duality | Active
+ * 1312447806480453715 | Thread / EON | Active
+ * 1541145761557774376 | Thread / ZIVATAR | Active
+685990573492142183  | Chat / hardest
+210778111594332181  | Chat / highscores
+199460839252688896  | Chat / n
+1076616816312459304 | Chat / nplus
+1512496882755305482 | Chat / nplusinfinitytimestwo
+197765375503368192  | Chat / nplusplus
+197774025844457472  | Chat / nv2
+ * 978061424985272340 | Thread / letter | Active
+ * 941808645174333500 | Thread / number | Active
+217283494664077312  | Chat / secrets
+231135753059565568  | Chat / speedrunning
+937106835540946984  | Chat / tas-discussion
+221721273405800458  | Chat / userlevels
+242979726761787392  | Community / contests
+467534405284397057  | Community / multiplayer
+1548875069424537740 | Community / n-fanart
+197793786389200896  | Community / n-streams
+592913929630384138  | Community / palette-creation
+228527830420422657  | Community / userlevel-featuring
+694603441019813959  | Community / userlevel-reviewers
+1137793981745475654 | Community Tab Project / ctp-general
+1137794057205198848 | Community Tab Project / ctp-highscores
+1137794113475969034 | Community Tab Project / ctp-secrets
+430014959791898624  | Support / feedback-discord
+200247214298234881  | Support / game-suggestion
+218819289266913281  | Support / support
+372216291001368576  | Misc. / bot-commands
+530162144843530240  | Misc. / debug-room
+199433768979660803  | Misc. / off-topic
+209411727635382273  | Misc. / off-topic-music
+1157534126073720933 | Misc. / other-games
+ * 1490920949015646288 | Thread / Derelict Star | Active
+ * 1276354661477126144 | Thread / Geometry Dash | Active
+963179194026692730  | Misc. / wordle-games
+197804339169984522  | Moderators / ?? Moderators
+372009665040482317  | Moderators / bot
+370734417548935178  | Moderators / join-leave
+679517829258805444  | Moderators / moderator-only
+218819729421369345  | Moderators / moderators
+277575003913060352  | Moderators / nhigh
+377238535528251394  | Moderators / test
+197807999593611264  | Voice Chat / ?? AFK
+198754008373002240  | Voice Chat / ?? Gaming Chat #1
+198754062353694721  | Voice Chat / ?? Gaming Chat #2
+197765376061341697  | Voice Chat / ?? General
+666715345674960936  | Voice Chat / voice-chat-text

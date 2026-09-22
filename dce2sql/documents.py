@@ -59,6 +59,9 @@ class Mod:
     reaction_users: bool = True
     cache: bool = False
     full_users: bool = False
+    #: Whether mentions, custom emoji and timestamps in a message body were resolved into
+    #: names.  True is DCE's default and what every export before the flag existed did.
+    markdown: bool = True
 
     @classmethod
     def parse(cls, header: dict) -> "Mod":
@@ -74,6 +77,7 @@ class Mod:
             reaction_users=bool(block.get("reactionUsers", True)),
             cache=bool(block.get("cache", False)),
             full_users=bool(block.get("fullUsers", False)),
+            markdown=bool(block.get("markdown", True)),
         )
 
     def describe(self) -> str:
@@ -86,6 +90,7 @@ class Mod:
             ("no-reaction-users", not self.reaction_users),
             ("cached", self.cache),
             ("full-users", self.full_users),
+            ("raw", not self.markdown),
         ) if on]
         return "+".join(flags) if flags else "default"
 
@@ -101,6 +106,12 @@ class Person:
     user: dict
     member: dict | None = None
     roles: list[dict] = field(default_factory=list)
+
+    #: The name DCE would have printed for this person in a resolved mention: the guild
+    #: nickname if there is one, else the account's display name.  Kept because it is the only
+    #: thing a resolved '@...' in a message body can be matched back against, and because a
+    #: vanilla export has nowhere else to put it -- see dce2sql.mentions.
+    rendered: str | None = None
 
     @property
     def id(self) -> Any:
@@ -136,13 +147,23 @@ class Lookups:
 class Document:
     """A DCE export reduced to one shape, whichever flags produced it."""
 
-    def __init__(self, raw: RawDocument) -> None:
+    def __init__(self, raw: RawDocument, unresolver=None) -> None:
         self.source: Source = raw.source
         self.header = raw.header
         self.kind = raw.array_key
         self.mod = Mod.parse(raw.header)
         self.lookups = Lookups(raw.header)
         self._raw = raw
+
+        # An export made with markdown off already holds the raw form, so there is nothing to
+        # put back and nothing to be gained by looking
+        self.unresolver = unresolver if self.mod.markdown else None
+        if self.unresolver is not None:
+            # This document's own role names, which are the ones in force when it was written
+            self.unresolver.add_roles(self._roles_of(raw.header.get("guild") or {}))
+
+        #: What the message being reduced says it mentions, for the unresolver
+        self._mentioned: list = []
 
         self.guild: dict = raw.header.get("guild") or {}
         self.channel: dict | None = raw.header.get("channel")
@@ -237,7 +258,13 @@ class Document:
     def _assemble(self, user: dict, member: dict | None) -> Person:
         """Already split by the exporter; only the roles need resolving."""
         roles = self._roles_of(member) if member else []
-        return Person(user=dict(user), member=dict(member) if member else None, roles=roles)
+        rendered = member.get("displayName") if member else user.get("displayName")
+        return Person(
+            user=dict(user),
+            member=dict(member) if member else None,
+            roles=roles,
+            rendered=rendered,
+        )
 
     def _unmerge(self, merged: dict) -> Person:
         """Take apart the single object vanilla DCE writes.
@@ -276,8 +303,12 @@ class Document:
             user["bannerUrl"] = banner
 
         resolved = merged.get("nickname")
+        # Whatever DCE printed for this person is 'nickname', collapsed and all -- which is
+        # exactly what a resolved mention in a message body says
+        rendered = merged.get("nickname")
+
         if not _is_member(merged, roles, member_avatar, member_banner):
-            return Person(user=user, member=None, roles=[])
+            return Person(user=user, member=None, roles=[], rendered=rendered)
 
         # The merged 'nickname' is nickname -> display name -> username already collapsed. When
         # the user's own display name is known, whichever of the two it isn't equal to is the
@@ -300,7 +331,7 @@ class Document:
             if extended_key in merged:
                 member[extended_key] = merged[extended_key]
 
-        return Person(user=user, member=member, roles=roles)
+        return Person(user=user, member=member, roles=roles, rendered=rendered)
 
     def _roles_of(self, obj: dict | None) -> list[dict]:
         if not obj:
@@ -342,7 +373,18 @@ class Document:
             user.pop("bannerUrl", None)
 
         member = {k: v for k, v in entry.items() if k not in ("user", "roles", "roleIds")}
-        return Person(user=user, member=member, roles=self._roles_of(entry))
+        return Person(
+            user=user,
+            member=member,
+            roles=self._roles_of(entry),
+            rendered=member.get("displayName"),
+        )
+
+    def _text(self, value):
+        """A body as it should be stored, with resolved mentions put back if asked."""
+        if self.unresolver is None or not value:
+            return value
+        return self.unresolver.unresolve(value, self._mentioned)
 
     def _message(self, raw: dict) -> dict:
         message = dict(raw)
@@ -360,10 +402,26 @@ class Document:
                 p for p in (self.person(m) for m in raw.get("mentions") or []) if p
             ]
 
+        # Whatever the message says it mentions is what a resolved '@name' in its body may be
+        # turned back into, so it has to be resolved before the body is touched
+        self._mentioned = message["mentions"]
+
+        if self.unresolver is not None:
+            # A vanilla export has no guild role inventory, but every person in it carries the
+            # roles they hold, with the IDs -- which between them name most of the roles the
+            # server has. Pooled as they are met, so a role mention later in the file can be
+            # put back even though nothing ever listed the roles outright.
+            for person in (message["author"], *self._mentioned):
+                if person is not None and person.roles:
+                    self.unresolver.add_roles(person.roles)
+
         message["stickers"] = self._stickers(raw)
         message["reactions"] = [self._reaction(r) for r in raw.get("reactions") or []]
         message["inlineEmojis"] = self._inline_emojis(raw)
         message["embeds"] = [self._embed(e) for e in raw.get("embeds") or []]
+
+        if self.unresolver is not None:
+            message["content"] = self._text(raw.get("content"))
 
         interaction = raw.get("interaction")
         if interaction:
@@ -383,6 +441,8 @@ class Document:
             resolved["stickers"] = self._stickers(forwarded)
             resolved["embeds"] = [self._embed(e) for e in forwarded.get("embeds") or []]
             resolved.pop("stickerIds", None)
+            if self.unresolver is not None:
+                resolved["content"] = self._text(forwarded.get("content"))
             message["forwardedMessage"] = resolved
 
         return message
@@ -402,6 +462,19 @@ class Document:
         # An embed's description can mention custom emoji too, lifted into the same root table
         embed["inlineEmojis"] = self._inline_emojis(raw)
         embed.pop("inlineEmojiKeys", None)
+
+        # An embed's text goes through the same formatter a message body does, so it carries
+        # the same resolved mentions and drifts for the same reasons
+        if self.unresolver is not None:
+            for key in ("title", "description"):
+                if embed.get(key):
+                    embed[key] = self._text(embed[key])
+            if embed.get("fields"):
+                embed["fields"] = [
+                    {**f, "name": self._text(f.get("name")), "value": self._text(f.get("value"))}
+                    for f in embed["fields"]
+                ]
+
         return embed
 
     def _reaction(self, raw: dict) -> dict:

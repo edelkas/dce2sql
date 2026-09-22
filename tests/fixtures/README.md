@@ -14,11 +14,20 @@ assert the databases match.
 | `split.json` | `--extended --split-users` |
 | `splitnorm.json` | `--extended --normal --split-users` |
 | `noreact.json` | `--extended --split-users --reaction-users false` |
+| `raw.json` | `--extended --markdown false` |
 | `roster.json` | `exportusers`, trimmed (see below) |
+| `channels.txt` | `channels --include-threads Active` |
 
 Between them they cover attachments, embeds with thumbnails and video, custom and standard
 emoji, a sticker, mentions, reactions, replies, threads and a parent channel that is never
 exported in its own right.
+
+**`raw.json` earns its place twice over.** It is the same 230 messages with `--markdown false`,
+so it is both the only fixture in the raw shape *and* the ground truth for the mention
+unresolver: whatever `--unresolve` reconstructs from `ext.json` has to come out identical to
+what DCE itself wrote here. A test asserts exactly that, for all 230 bodies. `channels.txt`
+supplies the channel names it needs, since two of the channels mentioned in those messages are
+not themselves exported.
 
 ## The two derived files
 
@@ -49,6 +58,9 @@ $EXE export -t "$DISCORD_TOKEN" -c $C -f Json -o extnorm.json   --after $A --bef
 $EXE export -t "$DISCORD_TOKEN" -c $C -f Json -o split.json     --after $A --before $B --extended --split-users
 $EXE export -t "$DISCORD_TOKEN" -c $C -f Json -o splitnorm.json --after $A --before $B --extended --normal --split-users
 $EXE export -t "$DISCORD_TOKEN" -c $C -f Json -o noreact.json   --after $A --before $B --extended --split-users --reaction-users false
+$EXE export -t "$DISCORD_TOKEN" -c $C -f Json -o raw.json       --after $A --before $B --extended --markdown false
+
+$EXE channels -t "$DISCORD_TOKEN" -g 197765375503368192 --include-threads Active > channels.txt
 ```
 
 Regenerating is rarely worth it. These are an archive of a moment: nicknames, roles, avatars and
