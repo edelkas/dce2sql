@@ -110,11 +110,14 @@ With the fork's `--normal` option, entities that have an identity are written on
   "members": Array<Object>,
   "roles": Array<Object>,
   "emojis": Array<Object>,
-  "stickers": Array<Object>
+  "stickers": Array<Object>,
+  "channels": Array<Object>
 }
 ```
 
-`members` only appears together with `splitUsers`. Wherever the denormalized form embeds an object, the normalized form puts a reference in its place:
+`members` only appears together with `splitUsers`, and `channels` only when `extended` found a
+channel mention to put in it. Note that `channels` holds only the channels some message *mentions*
+— the channel the export covers has its own object at the root, and is not repeated here. Wherever the denormalized form embeds an object, the normalized form puts a reference in its place:
 
 | Denormalized | Normalized | Table |
 | --- | --- | --- |
@@ -129,6 +132,8 @@ With the fork's `--normal` option, entities that have an identity are written on
 | `user.roles`, `member.roles`, `guild.roles` | `roleIds` | `roles` |
 | `guild.emojis` | `guild.emojiKeys` | `emojis` |
 | `guild.stickers` | `guild.stickerIds` | `stickers` |
+| `message.channelMentions` | `message.channelMentionIds` | `channels` |
+| `message.roleMentions` | `message.roleMentionIds` | `roles` |
 | `guild.owner`, `channel.owner` | *(omitted; only `ownerId` remains)* | `users` |
 
 Two things about this matter when parsing:
@@ -250,9 +255,27 @@ The extended fork also includes the following fields:
 ```
 {
   "flags": Array<String>,
-  "components": Array<Object>
+  "components": Array<Object>,
+  "channelMentions": Array<Object>,
+  "roleMentions": Array<Object>
 }
 ```
+
+`channelMentions` and `roleMentions` are the counterparts of `mentions` for the other two kinds of
+mention, which the original schema records nowhere. Each entry carries the identity of what was
+mentioned — `id`, `type`, `categoryId`, `category` and `name` for a channel; `id`, `name`, `color`
+and `position` for a role — with `id` always present and the rest null for something that could no
+longer be resolved.
+
+Both are read out of the raw message body rather than from Discord's payload, which carries only
+the mentioned users, and so they say the same thing whether or not `--markdown` resolved the body.
+That makes them the best possible source for turning a resolved `#channel-name` back into
+`<#id>`: named by the very export whose body is being read, so contemporaneous by construction.
+
+One caveat under `--normal`: a mentioned channel or role that could not be resolved still
+contributes its ID to `channelMentionIds` or `roleMentionIds`, but has no entry in the root table,
+since nothing but the ID is known about it. This is the only place in a normalized document where a
+reference may not resolve, so treat a miss as "deleted" rather than as a malformed document.
 
 ### User object
 

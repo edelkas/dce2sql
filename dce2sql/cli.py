@@ -113,16 +113,16 @@ def build_parser() -> argparse.ArgumentParser:
     )
     content = parser.add_argument_group(
         "message content",
-        "DCE resolves mentions into names before writing them, so a renamed channel or "
-        "nickname makes old messages look edited. Export with '--markdown false' to avoid "
-        "this; use these to repair exports already made.",
+        "DCE resolves mentions and custom emoji into names before writing them, so renaming "
+        "a channel, a nickname or an emoji makes old messages look edited. Export with "
+        "'--markdown false' to avoid this; use these to repair exports already made.",
     )
     content.add_argument(
         "--unresolve",
         action="store_true",
         help=(
-            "put resolved mentions back into their raw '<@123>' form before importing, so "
-            "that a later rename cannot make an unchanged message look edited"
+            "put resolved mentions and custom emoji back into their raw '<@123>' form before "
+            "importing, so that a later rename cannot make an unchanged message look edited"
         ),
     )
     content.add_argument(

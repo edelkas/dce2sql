@@ -18,7 +18,7 @@
     "premiumTier": 1,
     "premiumSubscriptionCount": 5,
     "approximateMemberCount": 5216,
-    "approximatePresenceCount": 1048,
+    "approximatePresenceCount": 1056,
     "ownerId": "198163965031743498",
     "owner": {
       "id": "198163965031743498",
@@ -1166,7 +1166,7 @@
     "after": "2025-01-01T01:00:00+01:00",
     "before": "2025-01-03T01:00:00+01:00"
   },
-  "exportedAt": "2026-09-22T01:29:28.9655627+02:00",
+  "exportedAt": "2026-09-22T02:56:12.4938627+02:00",
   "messages": [
     {
       "id": "1323839621293015140",
@@ -1390,6 +1390,8 @@
           "bannerUrl": null
         }
       ],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -1456,6 +1458,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -1734,6 +1738,8 @@
         }
       ],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -1804,6 +1810,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -1874,6 +1882,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -1994,6 +2004,8 @@
           "bannerUrl": null
         }
       ],
+      "channelMentions": [],
+      "roleMentions": [],
       "reference": {
         "type": "Default",
         "messageId": "1323852375164846101",
@@ -2124,6 +2136,8 @@
         }
       ],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -2237,6 +2251,8 @@
         }
       ],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -2270,6 +2286,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -2334,6 +2352,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -2392,6 +2412,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -2490,6 +2512,8 @@
         }
       ],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -2592,6 +2616,8 @@
           "bannerUrl": "https://cdn.discordapp.com/banners/1255619271699206244/f11bb2ae5c7c67afe4c191d0e95afc09.png?size=512"
         }
       ],
+      "channelMentions": [],
+      "roleMentions": [],
       "reference": {
         "type": "Default",
         "messageId": "1323839621293015140",
@@ -2650,6 +2676,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -2708,6 +2736,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -2760,6 +2790,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -2812,6 +2844,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -2870,6 +2904,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -2928,6 +2964,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -2986,6 +3024,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -3038,6 +3078,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -3096,6 +3138,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -3148,6 +3192,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -3206,6 +3252,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -3264,6 +3312,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -3322,6 +3372,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -3380,6 +3432,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -3489,6 +3543,8 @@
         }
       ],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -3555,6 +3611,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -3595,6 +3653,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": [
         {
           "id": "434937930247700482",
@@ -3755,6 +3815,8 @@
         }
       ],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -3821,6 +3883,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -3923,6 +3987,8 @@
           "bannerUrl": "https://cdn.discordapp.com/banners/1255619271699206244/f11bb2ae5c7c67afe4c191d0e95afc09.png?size=512"
         }
       ],
+      "channelMentions": [],
+      "roleMentions": [],
       "reference": {
         "type": "Default",
         "messageId": "1323877059256123403",
@@ -3981,6 +4047,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -4033,6 +4101,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -4135,6 +4205,8 @@
           "bannerUrl": null
         }
       ],
+      "channelMentions": [],
+      "roleMentions": [],
       "reference": {
         "type": "Default",
         "messageId": "1323909514474422313",
@@ -4207,6 +4279,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -4259,6 +4333,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -4311,6 +4387,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -4363,6 +4441,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -4433,6 +4513,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -4621,6 +4703,8 @@
         }
       ],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -4727,6 +4811,8 @@
         }
       ],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -4840,6 +4926,8 @@
         }
       ],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -5955,6 +6043,8 @@
         }
       ],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -6021,6 +6111,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -6087,6 +6179,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -6153,6 +6247,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": [
         {
           "id": "711809267547766806",
@@ -6201,6 +6297,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -6241,6 +6339,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": [
         {
           "id": "811160376917360701",
@@ -6322,6 +6422,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -6362,6 +6464,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -6426,6 +6530,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": [
         {
           "id": "535689125957992468",
@@ -6474,6 +6580,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -6514,6 +6622,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "reference": {
         "type": "Default",
         "messageId": "1324073199306014944",
@@ -6594,6 +6704,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": [
         {
           "id": "",
@@ -6668,6 +6780,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -6777,6 +6891,8 @@
         }
       ],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -6980,6 +7096,8 @@
         }
       ],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -7020,6 +7138,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": [
         {
           "id": "",
@@ -7118,6 +7238,8 @@
           "bannerUrl": "https://cdn.discordapp.com/banners/1255619271699206244/f11bb2ae5c7c67afe4c191d0e95afc09.png?size=512"
         }
       ],
+      "channelMentions": [],
+      "roleMentions": [],
       "reference": {
         "type": "Default",
         "messageId": "1324074621867135018",
@@ -7164,6 +7286,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -7232,6 +7356,8 @@
         }
       ],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -7298,6 +7424,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -7388,6 +7516,8 @@
           "bannerUrl": null
         }
       ],
+      "channelMentions": [],
+      "roleMentions": [],
       "reference": {
         "type": "Default",
         "messageId": "1324080983586242670",
@@ -7458,6 +7588,8 @@
           "bannerUrl": null
         }
       ],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -7505,6 +7637,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -7571,6 +7705,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -7637,6 +7773,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -7703,6 +7841,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -7767,6 +7907,8 @@
           "bannerUrl": null
         }
       ],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -7842,6 +7984,8 @@
         }
       ],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -7908,6 +8052,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -7948,6 +8094,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -8014,6 +8162,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -8080,6 +8230,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -8146,6 +8298,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -8279,6 +8433,8 @@
           "bannerUrl": null
         }
       ],
+      "channelMentions": [],
+      "roleMentions": [],
       "reference": {
         "type": "Default",
         "messageId": "1324080451870130248",
@@ -8351,6 +8507,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -8506,6 +8664,8 @@
         }
       ],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": [
         {
           "id": "1237512617140945059",
@@ -8597,6 +8757,8 @@
           "bannerUrl": "https://cdn.discordapp.com/banners/188790334694621185/a81315ce185fdabc455fc9f661640722.png?size=512"
         }
       ],
+      "channelMentions": [],
+      "roleMentions": [],
       "reference": {
         "type": "Default",
         "messageId": "1324082906435424348",
@@ -8669,6 +8831,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -8735,6 +8899,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -8768,6 +8934,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": [
         {
           "id": "1231927678446211163",
@@ -8809,6 +8977,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -8892,6 +9062,8 @@
           "bannerUrl": "https://cdn.discordapp.com/banners/188790334694621185/a81315ce185fdabc455fc9f661640722.png?size=512"
         }
       ],
+      "channelMentions": [],
+      "roleMentions": [],
       "reference": {
         "type": "Default",
         "messageId": "1324086395551092787",
@@ -9746,6 +9918,8 @@
         }
       ],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": [
         {
           "id": "1314580376085336125",
@@ -9812,6 +9986,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "reference": {
         "type": "Default",
         "messageId": "1324071142952276029",
@@ -9864,6 +10040,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -9947,6 +10125,8 @@
           "bannerUrl": "https://cdn.discordapp.com/banners/188790334694621185/a81315ce185fdabc455fc9f661640722.png?size=512"
         }
       ],
+      "channelMentions": [],
+      "roleMentions": [],
       "reference": {
         "type": "Default",
         "messageId": "1324088651474403368",
@@ -10019,6 +10199,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -10203,6 +10385,8 @@
         }
       ],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -10243,6 +10427,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": [
         {
           "id": "1314580376085336125",
@@ -10484,6 +10670,8 @@
         }
       ],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -10560,6 +10748,8 @@
         }
       ],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "reference": {
         "type": "Default",
         "messageId": "1324095612332802068",
@@ -10607,6 +10797,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -10683,6 +10875,8 @@
         }
       ],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -10766,6 +10960,8 @@
           "bannerUrl": "https://cdn.discordapp.com/banners/1255619271699206244/f11bb2ae5c7c67afe4c191d0e95afc09.png?size=512"
         }
       ],
+      "channelMentions": [],
+      "roleMentions": [],
       "reference": {
         "type": "Default",
         "messageId": "1324071142952276029",
@@ -10868,6 +11064,8 @@
           "bannerUrl": "https://cdn.discordapp.com/banners/1255619271699206244/f11bb2ae5c7c67afe4c191d0e95afc09.png?size=512"
         }
       ],
+      "channelMentions": [],
+      "roleMentions": [],
       "reference": {
         "type": "Default",
         "messageId": "1324071142952276029",
@@ -10920,6 +11118,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": [
         {
           "id": "336271943546306561",
@@ -10968,6 +11168,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "reference": {
         "type": "Default",
         "messageId": "1324146784250888277",
@@ -11028,6 +11230,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -11092,6 +11296,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -11138,6 +11344,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -11171,6 +11379,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -11235,6 +11445,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -11268,6 +11480,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -11356,6 +11570,8 @@
           "bannerUrl": null
         }
       ],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -11393,7 +11609,7 @@
       "attachments": [
         {
           "id": "1324178780280983592",
-          "url": "https://cdn.discordapp.com/attachments/197765375503368192/1324178780280983592/MET-SI-C-02-01.png?ex=6ab27a57&is=6ab128d7&hm=26cbdebcd7fab52bb5e622dad46a7a0ba8c6255147a086309d7b4eb2dc6c0fe8&",
+          "url": "https://cdn.discordapp.com/attachments/197765375503368192/1324178780280983592/MET-SI-C-02-01.png?ex=6ab32317&is=6ab1d197&hm=2c2372003f71fdadbc6b7ce5ab536962499c4de0a1e0d96826416307c1d6c662&",
           "fileName": "MET-SI-C-02-01.png",
           "fileSizeBytes": 49669
         }
@@ -11403,6 +11619,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -11436,6 +11654,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -11500,6 +11720,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -11564,6 +11786,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -11628,6 +11852,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -11661,6 +11887,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -11725,6 +11953,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -11789,6 +12019,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -11835,6 +12067,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -11881,6 +12115,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -11911,7 +12147,7 @@
       "attachments": [
         {
           "id": "1324179689660747816",
-          "url": "https://cdn.discordapp.com/attachments/197765375503368192/1324179689660747816/image.png?ex=6ab27b30&is=6ab129b0&hm=99ed511c69e0acd8f5711a94d8d219b443da8142467eb1a1d0316fe169f0335a&",
+          "url": "https://cdn.discordapp.com/attachments/197765375503368192/1324179689660747816/image.png?ex=6ab323f0&is=6ab1d270&hm=78632039ad59c371c19a8e3fb54ea492cf891b5198e84c9cc5e13327449920ee&",
           "fileName": "image.png",
           "fileSizeBytes": 16544
         }
@@ -11976,6 +12212,8 @@
         }
       ],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": [
         {
           "id": "1286124378722926664",
@@ -12048,6 +12286,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": [
         {
           "id": "230343942896484352",
@@ -12120,6 +12360,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -12371,6 +12613,8 @@
         }
       ],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -12404,6 +12648,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -12486,6 +12732,8 @@
           "bannerUrl": null
         }
       ],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -12533,6 +12781,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -12597,6 +12847,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -12661,6 +12913,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -12694,6 +12948,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -12758,6 +13014,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -12798,6 +13056,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -12856,6 +13116,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -12920,6 +13182,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -12978,6 +13242,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -13042,6 +13308,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -13100,6 +13368,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -13191,6 +13461,8 @@
         }
       ],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -13224,6 +13496,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -13288,6 +13562,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": [
         {
           "id": "230343942896484352",
@@ -13329,6 +13605,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -13362,6 +13640,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -13426,6 +13706,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -13459,6 +13741,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -13540,6 +13824,8 @@
           "bannerUrl": null
         }
       ],
+      "channelMentions": [],
+      "roleMentions": [],
       "reference": {
         "type": "Default",
         "messageId": "1324186462664786004",
@@ -13579,6 +13865,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -13612,6 +13900,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -13676,6 +13966,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -13740,6 +14032,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -13773,6 +14067,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -13837,6 +14133,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -13901,6 +14199,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -13993,6 +14293,8 @@
         }
       ],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -14026,6 +14328,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -14059,6 +14363,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -14160,6 +14466,8 @@
         }
       ],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -14193,6 +14501,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -14239,6 +14549,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -14279,6 +14591,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -14319,6 +14633,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": [
         {
           "id": "336271943546306561",
@@ -14385,6 +14701,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -14443,6 +14761,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -14492,6 +14812,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -14525,6 +14847,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -14619,6 +14943,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -14652,6 +14978,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -14733,6 +15061,16 @@
           "bannerUrl": null
         }
       ],
+      "channelMentions": [
+        {
+          "id": "218819289266913281",
+          "type": "GuildTextChat",
+          "categoryId": "449367495544143892",
+          "category": "Support",
+          "name": "support"
+        }
+      ],
+      "roleMentions": [],
       "reference": {
         "type": "Default",
         "messageId": "1324213470903795865",
@@ -14772,6 +15110,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -14805,6 +15145,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -14885,6 +15227,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -14949,6 +15293,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -14982,6 +15328,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -15015,6 +15363,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -15079,6 +15429,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -15112,6 +15464,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -15176,6 +15530,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -15216,6 +15572,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "reference": {
         "type": "Default",
         "messageId": "1324385163505045514",
@@ -15262,6 +15620,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -15319,6 +15679,8 @@
           "bannerUrl": "https://cdn.discordapp.com/banners/142458564835803137/da8b38bce59c30f26f5f51037a0c5e25.png?size=512"
         }
       ],
+      "channelMentions": [],
+      "roleMentions": [],
       "reference": {
         "type": "Default",
         "messageId": "1324387988104544339",
@@ -15358,6 +15720,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -15398,6 +15762,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": [
         {
           "id": "558002946089025561",
@@ -15439,6 +15805,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -15530,6 +15898,8 @@
         }
       ],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -15563,6 +15933,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -15679,6 +16051,8 @@
         }
       ],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": [
         {
           "id": "336271943546306561",
@@ -15720,6 +16094,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -15778,6 +16154,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -15836,6 +16214,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -15876,6 +16256,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": [
         {
           "id": "558002946089025561",
@@ -15917,6 +16299,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -16009,6 +16393,8 @@
           "bannerUrl": null
         }
       ],
+      "channelMentions": [],
+      "roleMentions": [],
       "reference": {
         "type": "Default",
         "messageId": "1324391755143188582",
@@ -16048,6 +16434,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -16130,6 +16518,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -16170,6 +16560,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": [
         {
           "id": "558002946089025561",
@@ -16218,6 +16610,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -16258,6 +16652,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -16298,6 +16694,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -16338,6 +16736,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -16429,6 +16829,8 @@
         }
       ],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -16469,6 +16871,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": [
         {
           "id": "604022990383874061",
@@ -16510,6 +16914,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -16543,6 +16949,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -16590,6 +16998,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -16630,6 +17040,16 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [
+        {
+          "id": "221721273405800458",
+          "type": "GuildTextChat",
+          "categoryId": "449367560878686208",
+          "category": "Chat",
+          "name": "userlevels"
+        }
+      ],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -16663,6 +17083,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -16769,6 +17191,8 @@
         }
       ],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -16802,6 +17226,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -16866,6 +17292,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -16899,6 +17327,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -16939,6 +17369,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -17069,6 +17501,8 @@
           "bannerUrl": null
         }
       ],
+      "channelMentions": [],
+      "roleMentions": [],
       "reference": {
         "type": "Default",
         "messageId": "1324393714906304533",
@@ -17141,6 +17575,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -17199,6 +17635,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -17281,6 +17719,8 @@
           "bannerUrl": "https://cdn.discordapp.com/banners/203540032739344384/a_95b31e0edfdc9d87c0ece153d1a09eaf.gif?size=512"
         }
       ],
+      "channelMentions": [],
+      "roleMentions": [],
       "reference": {
         "type": "Default",
         "messageId": "1324418319645675651",
@@ -17327,6 +17767,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -17384,6 +17826,8 @@
           "bannerUrl": null
         }
       ],
+      "channelMentions": [],
+      "roleMentions": [],
       "reference": {
         "type": "Default",
         "messageId": "1324433059054882887",
@@ -17423,6 +17867,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -17463,6 +17909,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -17644,6 +18092,8 @@
         }
       ],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -17684,6 +18134,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -17748,6 +18200,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -17781,6 +18235,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -17845,6 +18301,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -17878,6 +18336,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -17960,6 +18420,8 @@
           "bannerUrl": null
         }
       ],
+      "channelMentions": [],
+      "roleMentions": [],
       "reference": {
         "type": "Default",
         "messageId": "1324433140051214428",
@@ -17999,6 +18461,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -18063,6 +18527,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -18127,6 +18593,16 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [
+        {
+          "id": "467534405284397057",
+          "type": "GuildTextChat",
+          "categoryId": "449367545112166411",
+          "category": "Community",
+          "name": "multiplayer"
+        }
+      ],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -18191,6 +18667,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -18255,6 +18733,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -18319,6 +18799,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     },
     {
@@ -18383,6 +18865,8 @@
       "components": [],
       "reactions": [],
       "mentions": [],
+      "channelMentions": [],
+      "roleMentions": [],
       "inlineEmojis": []
     }
   ],

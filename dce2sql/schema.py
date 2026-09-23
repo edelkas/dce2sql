@@ -380,6 +380,25 @@ MESSAGE_EMOJIS = _aux(
     comment="Emoji used in a message's content, or inside one of its embeds.",
 )
 
+CHANNEL_MENTIONS = _aux(
+    "channel_mentions",
+    Column("message_id", ID, null=False),
+    Column("channel_id", ID, null=False),
+    unique=(("message_id", "channel_id"),),
+    comment=(
+        "Channels a message mentions. Only an extended export records these: Discord's "
+        "payload names the users a message mentions but not the channels."
+    ),
+)
+
+ROLE_MENTIONS = _aux(
+    "role_mentions",
+    Column("message_id", ID, null=False),
+    Column("role_id", ID, null=False),
+    unique=(("message_id", "role_id"),),
+    comment="Roles a message mentions. Extended exports only, as above.",
+)
+
 MESSAGE_STICKERS = _aux(
     "message_stickers",
     Column("message_id", ID, null=False),
@@ -437,6 +456,8 @@ TABLES: tuple[Table, ...] = (
     EMBEDS,
     RESOURCES,
     MENTIONS,
+    CHANNEL_MENTIONS,
+    ROLE_MENTIONS,
     REACTIONS,
     MESSAGE_EMOJIS,
     MESSAGE_STICKERS,

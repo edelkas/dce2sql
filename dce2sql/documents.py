@@ -127,6 +127,8 @@ class Lookups:
 
     def __init__(self, header: dict) -> None:
         self.users = {u.get("id"): u for u in header.get("users") or []}
+        # Only the channels some message mentions; the exported channel has its own object
+        self.channels = {c.get("id"): c for c in header.get("channels") or []}
         self.members = {m.get("userId"): m for m in header.get("members") or []}
         self.roles = {r.get("id"): r for r in header.get("roles") or []}
         self.stickers = {s.get("id"): s for s in header.get("stickers") or []}
@@ -136,6 +138,9 @@ class Lookups:
 
     def role(self, role_id) -> dict:
         return self.roles.get(role_id) or {"id": role_id}
+
+    def channel(self, channel_id) -> dict:
+        return self.channels.get(channel_id) or {"id": channel_id}
 
     def emoji(self, key) -> dict:
         return self.emojis.get(key) or {"name": key, "code": key}
@@ -164,6 +169,8 @@ class Document:
 
         #: What the message being reduced says it mentions, for the unresolver
         self._mentioned: list = []
+        self._named_channels: list = []
+        self._named_roles: list = []
 
         self.guild: dict = raw.header.get("guild") or {}
         self.channel: dict | None = raw.header.get("channel")
@@ -380,11 +387,23 @@ class Document:
             rendered=member.get("displayName"),
         )
 
-    def _text(self, value):
-        """A body as it should be stored, with resolved mentions put back if asked."""
+    def _referenced(self, raw: dict, inline_key: str, reference_key: str, resolve) -> list:
+        """One of the mention arrays, however the document happened to write it."""
+        if reference_key in raw:
+            return [resolve(i) for i in raw[reference_key] or []]
+        return list(raw.get(inline_key) or [])
+
+    def _text(self, value, emojis=()):
+        """A body as it should be stored, with resolved mentions put back if asked.
+
+        ``emojis`` is whichever ``inlineEmojis`` array covers this particular body: a message
+        has one, and so does each of its embeds.
+        """
         if self.unresolver is None or not value:
             return value
-        return self.unresolver.unresolve(value, self._mentioned)
+        return self.unresolver.unresolve(
+            value, self._mentioned, self._named_channels, self._named_roles, emojis
+        )
 
     def _message(self, raw: dict) -> dict:
         message = dict(raw)
@@ -415,13 +434,30 @@ class Document:
                 if person is not None and person.roles:
                     self.unresolver.add_roles(person.roles)
 
+        # Channels and roles the body mentions, which only --extended records. Written by
+        # the very export being read, so the names are of exactly the right vintage.
+        message["channelMentions"] = self._referenced(
+            raw, "channelMentions", "channelMentionIds", self.lookups.channel
+        )
+        message["roleMentions"] = self._referenced(
+            raw, "roleMentions", "roleMentionIds", self.lookups.role
+        )
+
         message["stickers"] = self._stickers(raw)
         message["reactions"] = [self._reaction(r) for r in raw.get("reactions") or []]
         message["inlineEmojis"] = self._inline_emojis(raw)
+
+        # Set before anything is rewritten, embeds included: an embed's text goes through the
+        # same formatter a body does, and was being unresolved against the *previous* message's
+        # channels and roles until this moved up here.
+        if self.unresolver is not None:
+            self._named_channels = message["channelMentions"]
+            self._named_roles = message["roleMentions"]
+
         message["embeds"] = [self._embed(e) for e in raw.get("embeds") or []]
 
         if self.unresolver is not None:
-            message["content"] = self._text(raw.get("content"))
+            message["content"] = self._text(raw.get("content"), message["inlineEmojis"])
 
         interaction = raw.get("interaction")
         if interaction:
@@ -442,6 +478,8 @@ class Document:
             resolved["embeds"] = [self._embed(e) for e in forwarded.get("embeds") or []]
             resolved.pop("stickerIds", None)
             if self.unresolver is not None:
+                # A forward carries no inlineEmojis array of its own, so only its mentions can
+                # be put back; a custom emoji inside one stays as its shortcode
                 resolved["content"] = self._text(forwarded.get("content"))
             message["forwardedMessage"] = resolved
 
@@ -466,12 +504,17 @@ class Document:
         # An embed's text goes through the same formatter a message body does, so it carries
         # the same resolved mentions and drifts for the same reasons
         if self.unresolver is not None:
+            emojis = embed["inlineEmojis"]
             for key in ("title", "description"):
                 if embed.get(key):
-                    embed[key] = self._text(embed[key])
+                    embed[key] = self._text(embed[key], emojis)
             if embed.get("fields"):
                 embed["fields"] = [
-                    {**f, "name": self._text(f.get("name")), "value": self._text(f.get("value"))}
+                    {
+                        **f,
+                        "name": self._text(f.get("name"), emojis),
+                        "value": self._text(f.get("value"), emojis),
+                    }
                     for f in embed["fields"]
                 ]
 

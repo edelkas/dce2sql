@@ -1,6 +1,7 @@
 {
   "mod": {
-    "normal": false
+    "normal": false,
+    "fullUsers": false
   },
   "guild": {
     "id": "197765375503368192",
@@ -13,8 +14,8 @@
     "ownerId": "198163965031743498",
     "premiumTier": 1,
     "premiumSubscriptionCount": 5,
-    "approximateMemberCount": 5215,
-    "approximatePresenceCount": 815,
+    "approximateMemberCount": 5216,
+    "approximatePresenceCount": 1056,
     "roles": [
       {
         "id": "115385224119975941",
@@ -354,7 +355,7 @@
       }
     ]
   },
-  "exportedAt": "2026-09-19T14:18:45.085884+02:00",
+  "exportedAt": "2026-09-22T02:58:43.0102702+02:00",
   "members": [
     {
       "userId": "57595500404146176",
@@ -1927,8 +1928,8 @@
     },
     {
       "userId": "750469606212239381",
-      "nickname": "lily [7218 / 7280]",
-      "displayName": "lily [7218 / 7280]",
+      "nickname": "lily [7220 / 7280]",
+      "displayName": "lily [7220 / 7280]",
       "color": null,
       "avatarUrl": null,
       "bannerUrl": null,

@@ -19,8 +19,12 @@ assert the databases match.
 | `channels.txt` | `channels --include-threads Active` |
 
 Between them they cover attachments, embeds with thumbnails and video, custom and standard
-emoji, a sticker, mentions, reactions, replies, threads and a parent channel that is never
-exported in its own right.
+emoji, a sticker, user and channel mentions, reactions, replies, threads and a parent channel
+that is never exported in its own right.
+
+They were all taken on 2026-09-22, which is what matters most about them: several tests assert
+that two of these produce the *same* database, and exports of different moments would differ on
+nicknames, roles and reaction counts that have nothing to do with the code.
 
 **`raw.json` earns its place twice over.** It is the same 230 messages with `--markdown false`,
 so it is both the only fixture in the raw shape *and* the ground truth for the mention
@@ -28,6 +32,10 @@ unresolver: whatever `--unresolve` reconstructs from `ext.json` has to come out 
 what DCE itself wrote here. A test asserts exactly that, for all 230 bodies. `channels.txt`
 supplies the channel names it needs, since two of the channels mentioned in those messages are
 not themselves exported.
+
+The comparison is byte for byte, with nothing normalized away on either side. That includes
+custom emoji: `--unresolve` puts `:goldheart:` back as `<:goldheart:711809267547766806>` from
+the message's own `inlineEmojis`, exactly as it does mentions.
 
 ## The two derived files
 

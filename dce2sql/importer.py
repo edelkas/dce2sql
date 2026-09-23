@@ -191,6 +191,7 @@ class Importer:
         self._messages(batch, channel_id, fs, now)
         self._attachments(batch, now)
         self._mentions(batch)
+        self._mention_targets(batch, guild_id, now)
         self._message_stickers(batch)
         self._reactions(batch, emoji_ids)
         self._embeds(batch, emoji_ids, now)
@@ -616,6 +617,60 @@ class Importer:
                 if message_id is not None and user_id is not None:
                     rows.add((message_id, user_id))
         self._insert_ignore(schema.MENTIONS, ("message_id", "user_id"), sorted(rows))
+
+    def _mention_targets(self, batch: list[dict], guild_id: int | None, now: int) -> None:
+        """Channels and roles a message mentions, which only an extended export records.
+
+        The channels are worth writing as rows in their own right, not just as a junction: a
+        mention is often the only place an archive ever hears of a channel that was never
+        exported, and losing its name would be a shame.  Only the fields a mention carries are
+        written, so this can never overwrite a real export of that channel with less.
+        """
+        channels: dict[int, dict] = {}
+        channel_rows, role_rows = set(), set()
+        roles: dict[int, dict] = {}
+
+        for message in batch:
+            message_id = snowflake(message.get("id"))
+            if message_id is None:
+                continue
+
+            for channel in message.get("channelMentions") or []:
+                channel_id = snowflake(channel.get("id"))
+                if channel_id is None:
+                    continue
+                channel_rows.add((message_id, channel_id))
+
+                record: dict[str, Any] = {"id": channel_id}
+                if channel.get("name"):
+                    # Only a channel that actually resolved is known to be in this guild: the
+                    # exporter looks a mention up in this guild's channels, so one it could not
+                    # find may well belong to another server entirely
+                    record["guild_id"] = guild_id
+                    record["name"] = channel["name"]
+                if channel.get("type") is not None:
+                    record["type"] = self._channel_type(channel["type"])
+                if channel.get("categoryId"):
+                    record["parent_id"] = snowflake(channel["categoryId"])
+                channels[channel_id] = record
+
+            for role in message.get("roleMentions") or []:
+                role_id = snowflake(role.get("id"))
+                if role_id is None:
+                    continue
+                role_rows.add((message_id, role_id))
+                if role.get("name"):
+                    roles[role_id] = _role_record(role_id, role, guild_id)
+
+        # A mentioned channel's parent is named only by ID here, so no stub is invented for it
+        self._merge(schema.CHANNELS, channels, now)
+        self._merge(schema.ROLES, roles, now)
+        self._insert_ignore(
+            schema.CHANNEL_MENTIONS, ("message_id", "channel_id"), sorted(channel_rows)
+        )
+        self._insert_ignore(
+            schema.ROLE_MENTIONS, ("message_id", "role_id"), sorted(role_rows)
+        )
 
     def _message_stickers(self, batch: list[dict]) -> None:
         rows = set()

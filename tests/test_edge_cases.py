@@ -71,9 +71,14 @@ class TestDegenerateExports:
         import_files(db, make("ext.json", to_dm))
 
         assert rows(db, "SELECT id, name FROM guilds") == [(0, "Direct Messages")]
-        assert rows(db, "SELECT guild_id, type FROM channels") == [(0, 1)]
-        # No parent was named, so none should have been invented
-        assert rows(db, "SELECT COUNT(*) FROM channels WHERE parent_id IS NOT NULL") == [(0,)]
+        assert rows(
+            db, "SELECT guild_id, type FROM channels WHERE id = 999888777666555444"
+        ) == [(0, 1)]
+        # A DM names no parent, so none should have been invented for it. The other rows in
+        # this table are channels the doctored bodies mention, which bring their own parents.
+        assert rows(
+            db, "SELECT parent_id FROM channels WHERE id = 999888777666555444"
+        ) == [(None,)]
 
 
 class TestUnknownTypes:

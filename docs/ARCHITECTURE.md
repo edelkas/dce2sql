@@ -102,7 +102,8 @@ split exports producing the same rows.
 DCE resolves five things in a message body before writing it, and every one is resolved against
 something that can change afterwards: user mentions into nicknames, channel mentions into
 channel names, role mentions into role names, custom emoji into shortcodes, and `<t:…>`
-timestamps into locale-formatted dates.
+timestamps into locale-formatted dates. Four of the five can be put back; only the timestamp
+cannot, because its format string is gone.
 
 Rename a channel, re-export the year, and the body of every message that ever mentioned it is
 now different text. The merge policy compares content to decide whether a message changed, so
@@ -117,8 +118,17 @@ the resolution:
 | Kind | Recovered from | Reach |
 | --- | --- | --- |
 | User | the message's own `mentions` array | only names that message says it mentions |
-| Role | the guild's role inventory | the whole server |
-| Channel | a pooled name-to-ID index | the run's exports, a `channels` listing, the database |
+| Emoji | the message's own `inlineEmojis` array | only emoji that message says it uses |
+| Channel | the message's own `channelMentions`, else a pooled index | that message, else the run's exports, a `channels` listing, the database |
+| Role | the message's own `roleMentions`, else the guild's roles | that message, else the whole server |
+
+Only custom emoji have a raw form at all. A standard one is written as the character itself,
+which is already what Discord stores, so an entry without an ID is skipped rather than mangled.
+
+`channelMentions` and `roleMentions` are what `--extended` writes per message, and where they
+exist nothing else is needed: they are named by the very export whose body is being read, so the
+names are contemporaneous by construction and scoped to the one message. The pooled index below
+is the fallback for everything else — vanilla exports, and extended ones predating those keys.
 
 The channel index is the interesting one, because a name is only meaningful *as of some
 moment*. The exports being imported know their own channel and its parent as they were named at
@@ -144,12 +154,20 @@ thing once it is stored. So the matching is guarded on both sides.
 - **`@everyone` and `@here` are left alone**, which also means skipping Discord's everyone
   *role* — it is literally named `@everyone`, and treating it as a role would produce
   `@@everyone`.
+- **Nothing already raw is touched twice.** Every raw form starts with `<`, so a token preceded
+  by one is skipped — without which `:victory:` inside `<a:victory:434…>` would be substituted
+  again and the body destroyed.
 - **What DCE could not resolve is left too**: `@Unknown`, `#deleted-channel` and
   `@deleted-role` carry no ID and nothing can be recovered from them.
 
 Some mentions are irreversible whatever is done, and that is expected rather than an error. The
 run reports what it put back so the figure can be sanity-checked, and `imports.unresolved`
 records that the bodies of that file were rewritten.
+
+The test that settles whether any of this works is `TestGroundTruth`: `raw.json` is the fixture
+exported a second time with `--markdown false`, so it holds exactly what the inverter is trying
+to reconstruct. All 230 bodies have to come out byte-identical to it, with nothing normalized
+away on either side.
 
 ## Importing
 

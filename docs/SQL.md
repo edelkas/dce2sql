@@ -27,6 +27,8 @@ This file details the SQL database schema and documents each of the fields. The 
    * [User roles table](#user-roles-table)
    * [Reactions table](#reactions-table)
    * [Mentions table](#mentions-table)
+   * [Channel mentions table](#channel-mentions-table)
+   * [Role mentions table](#role-mentions-table)
    * [Message emojis table](#message-emojis-table)
    * [Message stickers table](#message-stickers-table)
 - [Metadata tables](#metadata-tables)
@@ -36,7 +38,7 @@ This file details the SQL database schema and documents each of the fields. The 
 
 The database is able to store an arbitrary amount of chat dumps, even from different guilds. It uses UTF-8 encoding and all ID fields are be 8 bytes, as Discord's own IDs are used whenever available (e.g. guild IDs, channel IDs, message IDs, etc) instead of the default auto-incremental IDs.
 
-The database contains the following [**base tables**](#base-tables), which are the ones that map to actual Discord objects: [`guilds`](#guilds-table), [`channels`](#channels-table), [`messages`](#messages-table), [`users`](#users-table), [`attachments`](#attachments-table), [`roles`](#roles-table), [`emojis`](#emojis-table), [`stickers`](#stickers-table) and [`interactions`](#interactions-table). It also contains the following [**auxiliary tables**](#auxiliary-tables) which don't map to actual Discord objects: [`channel_types`](#channel-types-table), [`message_types`](#message-types-table), [`reference_types`](#reference-types-table), [`message_history`](#message-history-table), [`embeds`](#embeds-table) and [`resources`](#resources-table). Furthermore, it contains the following [**junction tables**](#junction-tables): [`members`](#members-table), [`user_roles`](#user-roles-table), [`reactions`](#reactions-table), [`mentions`](#mentions-table), [`message_emojis`](#message-emojis-table) and [`message_stickers`](#message-stickers-table). Finally, it contains the following [**metadata tables**](#metadata-tables): [`imports`](#imports-table). All base tables' ID fields are the actual 8-byte IDs used by Discord and taken from the JSON exports. The other tables, which don't map to actual Discord objects, use the standard auto-increment ID scheme instead.
+The database contains the following [**base tables**](#base-tables), which are the ones that map to actual Discord objects: [`guilds`](#guilds-table), [`channels`](#channels-table), [`messages`](#messages-table), [`users`](#users-table), [`attachments`](#attachments-table), [`roles`](#roles-table), [`emojis`](#emojis-table), [`stickers`](#stickers-table) and [`interactions`](#interactions-table). It also contains the following [**auxiliary tables**](#auxiliary-tables) which don't map to actual Discord objects: [`channel_types`](#channel-types-table), [`message_types`](#message-types-table), [`reference_types`](#reference-types-table), [`message_history`](#message-history-table), [`embeds`](#embeds-table) and [`resources`](#resources-table). Furthermore, it contains the following [**junction tables**](#junction-tables): [`members`](#members-table), [`user_roles`](#user-roles-table), [`reactions`](#reactions-table), [`mentions`](#mentions-table), [`channel_mentions`](#channel-mentions-table), [`role_mentions`](#role-mentions-table), [`message_emojis`](#message-emojis-table) and [`message_stickers`](#message-stickers-table). Finally, it contains the following [**metadata tables**](#metadata-tables): [`imports`](#imports-table). All base tables' ID fields are the actual 8-byte IDs used by Discord and taken from the JSON exports. The other tables, which don't map to actual Discord objects, use the standard auto-increment ID scheme instead.
 
 Some notes about specific common fields:
 
@@ -412,6 +414,28 @@ The `mentions` table stores all users' mentions in all messages. Each message co
 | --- | --- | --- |
 | message_id | Integer | ID of the message containing the mention |
 | user_id | Integer | ID of the user that was mentioned |
+
+### Channel mentions table
+
+The `channel_mentions` table stores which channels each message mentions, as [`mentions`](#mentions-table) does for users. It bridges the [Message](#messages-table) and [Channel](#channels-table) tables. It has the following fields:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| message_id | Integer | ID of the message containing the mention |
+| channel_id | Integer | ID of the channel that was mentioned |
+
+Only an extended export records these. Discord's message payload names the users a message mentions but not the channels, so the exporter reads them out of the message body; see [Mentioned channels and roles](JSON.md#message-object).
+
+A mention is often the only place the archive ever hears of a channel — one that was never exported in its own right, or that no longer exists — so the channel is also given a row of its own, carrying whatever the mention knew about it. Only the fields a mention carries are written, so this can never overwrite a real export of that channel with less.
+
+### Role mentions table
+
+The `role_mentions` table is the same thing for roles, bridging the [Message](#messages-table) and [Role](#roles-table) tables:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| message_id | Integer | ID of the message containing the mention |
+| role_id | Integer | ID of the role that was mentioned |
 
 ### Message emojis table
 
