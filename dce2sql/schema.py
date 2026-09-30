@@ -390,8 +390,9 @@ CHANNEL_MENTIONS = _aux(
     Column("channel_id", ID, null=False),
     unique=(("message_id", "channel_id"),),
     comment=(
-        "Channels a message mentions. Only an extended export records these: Discord's "
-        "payload names the users a message mentions but not the channels."
+        "Channels a message mentions. Discord's payload names the users a message "
+        "mentions but not the channels, so these come either from an extended export, "
+        "which reads them out of the body, or from --unresolve doing the same."
     ),
 )
 
@@ -400,7 +401,7 @@ ROLE_MENTIONS = _aux(
     Column("message_id", ID, null=False),
     Column("role_id", ID, null=False),
     unique=(("message_id", "role_id"),),
-    comment="Roles a message mentions. Extended exports only, as above.",
+    comment="Roles a message mentions. Same two sources as above.",
 )
 
 MESSAGE_STICKERS = _aux(

@@ -147,6 +147,13 @@ alongside each batch is what makes the rest reliable.
 With everything in place this is not an approximation: on the test corpus it reproduces DCE's
 own `--markdown false` output byte for byte, for all 230 message bodies.
 
+Recovering a channel or role mention also **records it in `channel_mentions` or
+`role_mentions`**, which is otherwise reachable only from an extended export: Discord's payload
+names the users a message mentions but not the channels or roles, so the body is the only place
+they are written down. Only the message body counts, matching the extended exporter, so a
+mention found inside an embed rewrites the embed's text without being recorded as one of the
+message's mentions.
+
 What cannot be recovered is left exactly as it is. That includes what DCE writes when it could
 not resolve something itself (`@Unknown`, `#deleted-channel`), standard Unicode emoji (the
 character *is* the raw form), and anything that merely looks like a mention — a bare `#hashtag`,

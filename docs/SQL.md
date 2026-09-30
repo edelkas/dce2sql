@@ -435,7 +435,9 @@ The `channel_mentions` table stores which channels each message mentions, as [`m
 | message_id | Integer | ID of the message containing the mention |
 | channel_id | Integer | ID of the channel that was mentioned |
 
-Only an extended export records these. Discord's message payload names the users a message mentions but not the channels, so the exporter reads them out of the message body; see [Mentioned channels and roles](JSON.md#message-object).
+Discord's message payload names the users a message mentions but not the channels or roles, so these have two possible sources, and it is never the payload. An extended export reads them out of the message body into its own `channelMentions`/`roleMentions` arrays; see [Mentioned channels and roles](JSON.md#message-object). Failing that, `--unresolve` recovers the same thing from the body as it rewrites resolved mentions back to their raw form, which is what makes these tables reachable from a vanilla export at all. Both are scoped to the message body, matching what the exporter itself reads, so a mention appearing only inside an embed is not recorded here.
+
+A mention recovered by `--unresolve` contributes only the junction row: the ID is what the body literally contains, whereas the name came from a pooled index spanning the whole run, which may hold a later rename or a same-named channel from elsewhere. So a channel known only from such a mention gets a row in `channels` with its ID and nothing else, exactly as an extended export's unresolvable mention does.
 
 A mention is often the only place the archive ever hears of a channel — one that was never exported in its own right, or that no longer exists — so the channel is also given a row of its own, carrying whatever the mention knew about it. Only the fields a mention carries are written, so this can never overwrite a real export of that channel with less.
 

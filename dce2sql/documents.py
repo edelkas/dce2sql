@@ -393,16 +393,44 @@ class Document:
             return [resolve(i) for i in raw[reference_key] or []]
         return list(raw.get(inline_key) or [])
 
-    def _text(self, value, emojis=()):
+    def _recovered_targets(self, named: list, recovered, resolve) -> list:
+        """Fold the mentions un-resolving found into the ones the export already named.
+
+        An extended export names them itself and needs nothing added -- un-resolving its body
+        can only rediscover the very same IDs -- so this is a no-op there beyond the de-duping.
+        For a vanilla export ``named`` is empty and everything comes from the body.
+
+        Only the ID is asserted, never a name: the ID is what the body literally contains,
+        whereas the name came from a pooled index that spans the whole run and may hold a
+        later rename, or a same-named channel from another server.  Recording it as though
+        this export had said it would be inventing provenance.
+        """
+        if not recovered:
+            return named
+        out = list(named)
+        known = {str(obj.get("id")) for obj in out if obj.get("id") is not None}
+        for target in recovered:
+            if target in known:
+                continue
+            known.add(target)
+            # A normalized export may have the object in a lookup table; without one the
+            # resolver already falls back to the bare ID, which is the honest answer
+            out.append(resolve(target))
+        return out
+
+    def _text(self, value, emojis=(), found=None):
         """A body as it should be stored, with resolved mentions put back if asked.
 
         ``emojis`` is whichever ``inlineEmojis`` array covers this particular body: a message
         has one, and so does each of its embeds.
+
+        ``found`` collects the channel and role mentions recovered, and is passed only for a
+        message's own content -- see :meth:`_recovered_targets`.
         """
         if self.unresolver is None or not value:
             return value
         return self.unresolver.unresolve(
-            value, self._mentioned, self._named_channels, self._named_roles, emojis
+            value, self._mentioned, self._named_channels, self._named_roles, emojis, found
         )
 
     def _message(self, raw: dict) -> dict:
@@ -457,7 +485,20 @@ class Document:
         message["embeds"] = [self._embed(e) for e in raw.get("embeds") or []]
 
         if self.unresolver is not None:
-            message["content"] = self._text(raw.get("content"), message["inlineEmojis"])
+            # A vanilla export names neither the channels nor the roles a message mentions, so
+            # whatever un-resolving recovers from the body is the only record of them there is.
+            # Collected from the content alone, which is the same thing the extended exporter
+            # reads its two arrays out of.
+            recovered: dict[str, list[str]] = {}
+            message["content"] = self._text(
+                raw.get("content"), message["inlineEmojis"], recovered
+            )
+            message["channelMentions"] = self._recovered_targets(
+                message["channelMentions"], recovered.get("channel"), self.lookups.channel
+            )
+            message["roleMentions"] = self._recovered_targets(
+                message["roleMentions"], recovered.get("role"), self.lookups.role
+            )
 
         interaction = raw.get("interaction")
         if interaction:

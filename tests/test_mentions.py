@@ -658,3 +658,216 @@ class TestTheWholePoint:
         self._import(db, before, self._index(list(self.renames)))
 
         assert rows(db, "SELECT unresolved FROM imports") == [(1,)]
+
+
+class TestRecordingWhatWasPutBack:
+    """A mention un-resolving recovers is also a row in ``channel_mentions``/``role_mentions``.
+
+    A vanilla export has no ``channelMentions`` or ``roleMentions`` array, so without this the
+    junction tables stayed empty however much un-resolving the bodies recovered -- the IDs went
+    into the text and nowhere else. ``mentions`` and ``message_emojis`` were never affected,
+    because ``mentions`` and ``inlineEmojis`` are written by every export, vanilla included.
+
+    The extended exporter builds its two arrays from ``MarkdownParser.ExtractMentions(content)``
+    -- the message body alone -- so that is the boundary matched here.
+    """
+
+    CHANNEL_ID = "218819289266913281"
+    OTHER_ID = "221721273405800458"
+    ROLE_ID = "198374136001593344"
+
+    def _document(self, tmp_path, name, message, extended=False):
+        document = {
+            "mod": {"normal": False, "extended": extended, "markdown": True},
+            "guild": {"id": "1", "name": "g", "iconUrl": ""},
+            "channel": {"id": "2", "name": "c", "type": "GuildTextChat"},
+            "dateRange": {"after": None, "before": None},
+            "messages": [{"id": "900", "type": "Default", "timestamp": "2025-01-01T00:00:00Z",
+                          "author": {"id": "5", "name": "a", "discriminator": "0000",
+                                     "nickname": "a", "isBot": False, "roles": [],
+                                     "avatarUrl": ""},
+                          "mentions": [], "inlineEmojis": [], **message}],
+            "messageCount": 1,
+        }
+        path = tmp_path / name
+        with path.open("w", encoding="utf-8") as handle:
+            json.dump(document, handle, ensure_ascii=False)
+        return path
+
+    def _index(self):
+        index = ChannelIndex()
+        index.add(self.CHANNEL_ID, "support", "test")
+        index.add(self.OTHER_ID, "userlevels", "test")
+        return index
+
+    def _import(self, db, path, with_roles=True):
+        from dce2sql.adapters import create
+        from dce2sql.importer import Importer
+
+        unresolver = Unresolver(self._index())
+        if with_roles:
+            unresolver.add_roles([{"id": self.ROLE_ID, "name": "Moderator"}])
+
+        adapter = create("sqlite", str(db))
+        adapter.connect()
+        try:
+            adapter.create_schema()
+            source = Source.of(path)
+            result = Importer(adapter).import_document(
+                Document(open_document(source), unresolver), source
+            )
+            assert result.error is None, result.error
+        finally:
+            adapter.close()
+
+    # -- what it must record -------------------------------------------------------------
+
+    def test_a_channel_mention_in_the_body_becomes_a_row(self, tmp_path):
+        path = self._document(tmp_path, "chan.json", {"content": "see #support for help"})
+        db = tmp_path / "chan.db"
+        self._import(db, path)
+
+        assert rows(db, "SELECT message_id, channel_id FROM channel_mentions") == [
+            (900, int(self.CHANNEL_ID))
+        ]
+
+    def test_a_role_mention_in_the_body_becomes_a_row(self, tmp_path):
+        path = self._document(tmp_path, "role.json", {"content": "ask a @Moderator"})
+        db = tmp_path / "role.db"
+        self._import(db, path)
+
+        assert rows(db, "SELECT message_id, role_id FROM role_mentions") == [
+            (900, int(self.ROLE_ID))
+        ]
+
+    def test_the_body_still_ends_up_in_its_raw_form(self, tmp_path):
+        """The rows are a by-product; putting the mention back is still the point."""
+        path = self._document(
+            tmp_path, "both.json", {"content": "see #support and ask a @Moderator"}
+        )
+        db = tmp_path / "both.db"
+        self._import(db, path)
+
+        assert rows(db, "SELECT content FROM messages") == [
+            (f"see <#{self.CHANNEL_ID}> and ask a <@&{self.ROLE_ID}>",)
+        ]
+
+    def test_two_channels_in_one_body_become_two_rows(self, tmp_path):
+        path = self._document(
+            tmp_path, "two.json", {"content": "#support then #userlevels"}
+        )
+        db = tmp_path / "two.db"
+        self._import(db, path)
+
+        assert rows(
+            db, "SELECT channel_id FROM channel_mentions ORDER BY channel_id"
+        ) == sorted([(int(self.CHANNEL_ID),), (int(self.OTHER_ID),)])
+
+    def test_the_same_channel_twice_becomes_one_row(self, tmp_path):
+        path = self._document(
+            tmp_path, "dupe.json", {"content": "#support and again #support"}
+        )
+        db = tmp_path / "dupe.db"
+        self._import(db, path)
+
+        assert rows(db, "SELECT COUNT(*) FROM channel_mentions") == [(1,)]
+
+    # -- and what it must not -------------------------------------------------------------
+
+    def test_a_mention_only_inside_an_embed_is_not_recorded(self, tmp_path):
+        """The extended arrays cover the body alone, so this must not invent a row.
+
+        The embed's text is still un-resolved -- that is a separate question from whether the
+        message is said to mention the channel.
+        """
+        path = self._document(
+            tmp_path,
+            "embed.json",
+            {
+                "content": "",
+                "embeds": [
+                    {"title": "go to #support", "description": "or @Moderator",
+                     "fields": [], "inlineEmojis": []}
+                ],
+            },
+        )
+        db = tmp_path / "embed.db"
+        self._import(db, path)
+
+        assert rows(db, "SELECT COUNT(*) FROM channel_mentions") == [(0,)]
+        assert rows(db, "SELECT COUNT(*) FROM role_mentions") == [(0,)]
+        assert rows(db, "SELECT title FROM embeds") == [(f"go to <#{self.CHANNEL_ID}>",)], (
+            "the embed's own text is still put back"
+        )
+
+    def test_a_name_that_was_never_matched_records_nothing(self, tmp_path):
+        # Timidity applies here as everywhere: '#support-tickets' is not '#support'
+        path = self._document(
+            tmp_path, "timid.json", {"content": "see #support-tickets"}
+        )
+        db = tmp_path / "timid.db"
+        self._import(db, path)
+
+        assert rows(db, "SELECT COUNT(*) FROM channel_mentions") == [(0,)]
+
+    def test_it_reaches_the_extended_export_on_the_real_corpus(self, tmp_path):
+        """The point of the whole thing, on 230 real messages rather than a synthetic one.
+
+        ``vanilla.json`` and ``ext.json`` are the same conversation exported both ways, so
+        with a listing to name the channels the vanilla import should now agree with the
+        extended one on all four mention tables -- row for row, not merely in count.
+        """
+        from dce2sql.adapters import create
+        from dce2sql.importer import Importer
+
+        index = ChannelIndex()
+        index.add_listing(fixture("channels.txt"))
+
+        vanilla = tmp_path / "vanilla.db"
+        adapter = create("sqlite", str(vanilla))
+        adapter.connect()
+        try:
+            adapter.create_schema()
+            source = Source.of(fixture("vanilla.json"))
+            result = Importer(adapter).import_document(
+                Document(open_document(source), Unresolver(index)), source
+            )
+            assert result.error is None, result.error
+        finally:
+            adapter.close()
+
+        extended = tmp_path / "extended.db"
+        import_files(extended, fixture("ext.json"))
+
+        for table, columns in (
+            ("channel_mentions", "message_id, channel_id"),
+            ("role_mentions", "message_id, role_id"),
+            ("mentions", "message_id, user_id"),
+            ("message_emojis", "message_id, emoji_id"),
+        ):
+            query = f"SELECT {columns} FROM {table} ORDER BY {columns}"
+            assert rows(vanilla, query) == rows(extended, query), table
+
+        # Not a vacuous pass: the fixture really does mention channels
+        assert rows(vanilla, "SELECT COUNT(*) FROM channel_mentions")[0][0] > 0
+
+    def test_an_extended_export_gains_no_duplicates(self, tmp_path):
+        """It already names them; re-finding the same IDs in the body must change nothing."""
+        named = {
+            "content": "see #support",
+            "channelMentions": [
+                {"id": self.CHANNEL_ID, "name": "support", "type": "GuildTextChat"}
+            ],
+            "roleMentions": [],
+        }
+        path = self._document(tmp_path, "ext.json", named, extended=True)
+        db = tmp_path / "extdup.db"
+        self._import(db, path)
+
+        assert rows(db, "SELECT message_id, channel_id FROM channel_mentions") == [
+            (900, int(self.CHANNEL_ID))
+        ]
+        # And the name the export gave is kept, rather than being lost to a bare stub
+        assert rows(
+            db, "SELECT name FROM channels WHERE id = ?", (int(self.CHANNEL_ID),)
+        ) == [("support",)]

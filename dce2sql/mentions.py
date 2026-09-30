@@ -181,7 +181,7 @@ class Unresolver:
         self._role_pattern = None
 
     def unresolve(
-        self, content: str, people=(), channels=(), roles=(), emojis=()
+        self, content: str, people=(), channels=(), roles=(), emojis=(), found=None
     ) -> str:
         """Return ``content`` with every mention it can identify put back in its raw form.
 
@@ -198,15 +198,22 @@ class Unresolver:
         ``emojis`` is the ``inlineEmojis`` array, which every export writes and which names
         every custom emoji in this body.  Nothing is pooled for these: an emoji is only ever put
         back where the message itself says one was used.
+
+        ``found``, when given, is a dict that collects the IDs of the channel and role mentions
+        put back, under the keys ``"channel"`` and ``"role"``.  A vanilla export has no
+        ``channelMentions`` or ``roleMentions`` array, so this is the only way those mentions
+        can be recorded as such -- the body is the one place they are written down, which is
+        exactly why the extended exporter reads them out of it too.  Pass it only for a message
+        body: that is all the extended arrays cover.
         """
         if not content:
             return content
 
         content = self._unresolve_people(content, people)
-        content = self._exact(content, roles, "@", _NAME_TAIL, "role")
-        content = self._unresolve_roles(content)
-        content = self._exact(content, channels, "#", _CHANNEL_TAIL, "channel")
-        content = self._unresolve_channels(content)
+        content = self._exact(content, roles, "@", _NAME_TAIL, "role", found)
+        content = self._unresolve_roles(content, found)
+        content = self._exact(content, channels, "#", _CHANNEL_TAIL, "channel", found)
+        content = self._unresolve_channels(content, found)
         content = self._unresolve_emojis(content, emojis)
         return content
 
@@ -229,11 +236,13 @@ class Unresolver:
         if not mapping:
             return content
 
-        content, hits = _apply(_compile(mapping, _EMOJI_TAIL), mapping, content)
-        self.recovered["emoji"] += hits
+        content, used = _apply(_compile(mapping, _EMOJI_TAIL), mapping, content)
+        self.recovered["emoji"] += len(used)
         return content
 
-    def _exact(self, content: str, objects, sigil: str, tail: str, kind: str) -> str:
+    def _exact(
+        self, content: str, objects, sigil: str, tail: str, kind: str, found=None
+    ) -> str:
         """Substitute from objects this very message names, which need no guessing at all."""
         raw = "<@&{}>" if kind == "role" else "<#{}>"
         mapping: dict[str, str] = {}
@@ -249,8 +258,9 @@ class Unresolver:
         if not mapping:
             return content
 
-        content, hits = _apply(_compile(mapping, tail), mapping, content)
-        self.recovered[kind] += hits
+        content, used = _apply(_compile(mapping, tail), mapping, content)
+        self.recovered[kind] += len(used)
+        _collect(found, kind, used)
         return content
 
     # -- the three kinds -----------------------------------------------------------------
@@ -272,24 +282,25 @@ class Unresolver:
         absent = sum(1 for token in names if token not in content)
 
         pattern = _compile(names, _NAME_TAIL)
-        content, hits = _apply(pattern, names, content)
+        content, used = _apply(pattern, names, content)
 
-        self.recovered["user"] += hits
+        self.recovered["user"] += len(used)
         self.not_in_body["user"] += absent
         return content
 
-    def _unresolve_roles(self, content: str) -> str:
+    def _unresolve_roles(self, content: str, found=None) -> str:
         if not self.roles:
             return content
         if self._role_pattern is None:
             self._role_map = {f"@{name}": f"<@&{i}>" for name, i in self.roles.items()}
             self._role_pattern = _compile(self._role_map, _NAME_TAIL)
 
-        content, hits = _apply(self._role_pattern, self._role_map, content)
-        self.recovered["role"] += hits
+        content, used = _apply(self._role_pattern, self._role_map, content)
+        self.recovered["role"] += len(used)
+        _collect(found, "role", used)
         return content
 
-    def _unresolve_channels(self, content: str) -> str:
+    def _unresolve_channels(self, content: str, found=None) -> str:
         if not self.channels:
             return content
         if self._channel_pattern is None:
@@ -304,8 +315,9 @@ class Unresolver:
             self._channel_map = mapping
             self._channel_pattern = _compile(mapping, _CHANNEL_TAIL)
 
-        content, hits = _apply(self._channel_pattern, self._channel_map, content)
-        self.recovered["channel"] += hits
+        content, used = _apply(self._channel_pattern, self._channel_map, content)
+        self.recovered["channel"] += len(used)
+        _collect(found, "channel", used)
         return content
 
     # -- reporting -----------------------------------------------------------------------
@@ -341,18 +353,55 @@ def _compile(mapping: dict[str, str], tail: str) -> re.Pattern:
     return re.compile(_LEAD + f"(?:{branches})" + tail)
 
 
-def _apply(pattern: re.Pattern, mapping: dict[str, str], content: str) -> tuple[str, int]:
-    hits = 0
+def _apply(
+    pattern: re.Pattern, mapping: dict[str, str], content: str
+) -> tuple[str, list[str]]:
+    """Substitute, and report every raw form that was put in.
+
+    The replacements are returned rather than merely counted, because a channel or role
+    mention put back into a body is also a fact worth recording in its own table, and the
+    raw form is where its ID is.  Repeats are kept: the count is a count of substitutions.
+    """
+    used: list[str] = []
 
     def swap(match: re.Match) -> str:
-        nonlocal hits
         replacement = mapping.get(match.group(0))
         if replacement is None:  # pragma: no cover -- the pattern is built from the mapping
             return match.group(0)
-        hits += 1
+        used.append(replacement)
         return replacement
 
-    return pattern.sub(swap, content), hits
+    return pattern.sub(swap, content), used
+
+
+#: The raw form of a channel or role mention, whose only variable part is the ID.
+_RAW_TARGET = re.compile(r"<(?:#|@&)(\d+)>")
+
+
+def _collect(found, kind: str, used: list[str]) -> None:
+    """Record the IDs put back, in order of appearance and without repeats.
+
+    No-op without a sink, which is the case for an embed or a forwarded body: the extended
+    exporter reads its mention arrays out of ``message.Content`` alone, so recording one found
+    anywhere else would give a vanilla import rows that no extended export of the same channel
+    would ever have.
+    """
+    if found is None:
+        return
+    bucket = found.setdefault(kind, [])
+    for target in _targets(used):
+        if target not in bucket:
+            bucket.append(target)
+
+
+def _targets(used: list[str]) -> list[str]:
+    """The IDs of the channel or role mentions among a set of substitutions."""
+    out = []
+    for replacement in used:
+        match = _RAW_TARGET.fullmatch(replacement)
+        if match is not None:
+            out.append(match.group(1))
+    return out
 
 
 def _parse_listing_line(line: str) -> tuple[str, str] | None:

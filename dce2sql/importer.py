@@ -620,12 +620,19 @@ class Importer:
         self._insert_ignore(schema.MENTIONS, ("message_id", "user_id"), sorted(rows))
 
     def _mention_targets(self, batch: list[dict], guild_id: int | None, now: int) -> None:
-        """Channels and roles a message mentions, which only an extended export records.
+        """Channels and roles a message mentions.
+
+        Two sources, and neither is Discord's message payload, which names only the users: an
+        extended export reads them out of the body into its own arrays, and ``--unresolve``
+        recovers them from the body as it puts the raw forms back.  Either way they arrive here
+        as ``channelMentions``/``roleMentions``, so this does not care which it was.
 
         The channels are worth writing as rows in their own right, not just as a junction: a
         mention is often the only place an archive ever hears of a channel that was never
         exported, and losing its name would be a shame.  Only the fields a mention carries are
-        written, so this can never overwrite a real export of that channel with less.
+        written, so this can never overwrite a real export of that channel with less -- and an
+        un-resolved mention carries only an ID, so it leaves a bare stub rather than claiming a
+        name of uncertain vintage.
         """
         channels: dict[int, dict] = {}
         channel_rows, role_rows = set(), set()
