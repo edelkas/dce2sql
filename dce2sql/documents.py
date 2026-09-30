@@ -38,6 +38,7 @@ from dataclasses import dataclass, field
 from typing import Any, Iterator
 
 from .reader import MEMBERS, MESSAGES, RawDocument, Source
+from .util import snowflake_timestamp, timestamp
 
 #: Matches the CDN path Discord uses for a member's guild-specific avatar or banner.
 _GUILD_ASSET = re.compile(r"/guilds/\d+/users/\d+/(avatars|banners)/", re.IGNORECASE)
@@ -171,6 +172,10 @@ class Document:
         self._mentioned: list = []
         self._named_channels: list = []
         self._named_roles: list = []
+
+        #: The latest moment the message being reduced could have been written, which bounds
+        #: what its body can possibly refer to
+        self._as_of: int | None = None
 
         self.guild: dict = raw.header.get("guild") or {}
         self.channel: dict | None = raw.header.get("channel")
@@ -430,7 +435,13 @@ class Document:
         if self.unresolver is None or not value:
             return value
         return self.unresolver.unresolve(
-            value, self._mentioned, self._named_channels, self._named_roles, emojis, found
+            value,
+            self._mentioned,
+            self._named_channels,
+            self._named_roles,
+            emojis,
+            found,
+            self._as_of,
         )
 
     def _message(self, raw: dict) -> dict:
@@ -452,6 +463,9 @@ class Document:
         # Whatever the message says it mentions is what a resolved '@name' in its body may be
         # turned back into, so it has to be resolved before the body is touched
         self._mentioned = message["mentions"]
+
+        if self.unresolver is not None:
+            self._as_of = _written_by(raw)
 
         if self.unresolver is not None:
             # A vanilla export has no guild role inventory, but every person in it carries the
@@ -586,6 +600,21 @@ def load(source: Source, **kwargs) -> Document:
 # --------------------------------------------------------------------------------------
 # Helpers
 # --------------------------------------------------------------------------------------
+
+
+def _written_by(raw: dict) -> int | None:
+    """The latest moment a message's body could have been written.
+
+    An edit is what makes this worth computing: a message sent in 2016 and edited in 2023 may
+    perfectly well name a channel created in 2022, so the edit time is the bound and not the
+    send time.  Falls back to the message's own ID, which encodes when it was sent and is
+    there even when the timestamp is not.
+    """
+    sent = timestamp(raw.get("timestamp")) or snowflake_timestamp(raw.get("id"))
+    edited = timestamp(raw.get("timestampEdited"))
+    if sent is None:
+        return edited
+    return max(sent, edited) if edited is not None else sent
 
 
 def _split_asset(url: str | None) -> tuple[str | None, str | None]:

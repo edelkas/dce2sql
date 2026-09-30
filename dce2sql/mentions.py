@@ -42,6 +42,8 @@ from collections import Counter
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from .util import snowflake_timestamp
+
 #: What DCE writes when it cannot resolve a mention. There is no ID behind these, so they stay.
 UNRESOLVABLE = {"user": "Unknown", "channel": "deleted-channel", "role": "deleted-role"}
 
@@ -160,6 +162,11 @@ class Unresolver:
     #: What was put back, by kind
     recovered: Counter = field(default_factory=Counter)
 
+    #: Matches the pooled index offered but that were refused because the channel or role did
+    #: not exist yet when the body was written.  Each one is text that merely looked like a
+    #: mention, so a non-zero count here is the guard working, not a shortfall.
+    anachronistic: Counter = field(default_factory=Counter)
+
     #: Names a message says it mentions that appear nowhere in its body.  Mostly *not* a
     #: failure: Discord puts the parent author into a reply's mentions although the reply's
     #: text never names them, which accounts for nearly all of these.  Kept because it is the
@@ -181,7 +188,14 @@ class Unresolver:
         self._role_pattern = None
 
     def unresolve(
-        self, content: str, people=(), channels=(), roles=(), emojis=(), found=None
+        self,
+        content: str,
+        people=(),
+        channels=(),
+        roles=(),
+        emojis=(),
+        found=None,
+        as_of=None,
     ) -> str:
         """Return ``content`` with every mention it can identify put back in its raw form.
 
@@ -205,15 +219,23 @@ class Unresolver:
         can be recorded as such -- the body is the one place they are written down, which is
         exactly why the extended exporter reads them out of it too.  Pass it only for a message
         body: that is all the extended arrays cover.
+
+        ``as_of`` is the latest moment this body could have been written -- the message's edit
+        time if it has one, else when it was sent.  It guards the two *pooled* lookups, which
+        are the only ones that can reach for something the body never referred to; see
+        :func:`_not_newer_than`.  The message's own arrays need no such guard: the export
+        already says this very message mentioned these very things.
         """
         if not content:
             return content
 
+        allow = _not_newer_than(as_of)
+
         content = self._unresolve_people(content, people)
         content = self._exact(content, roles, "@", _NAME_TAIL, "role", found)
-        content = self._unresolve_roles(content, found)
+        content = self._unresolve_roles(content, found, allow)
         content = self._exact(content, channels, "#", _CHANNEL_TAIL, "channel", found)
-        content = self._unresolve_channels(content, found)
+        content = self._unresolve_channels(content, found, allow)
         content = self._unresolve_emojis(content, emojis)
         return content
 
@@ -236,7 +258,9 @@ class Unresolver:
         if not mapping:
             return content
 
-        content, used = _apply(_compile(mapping, _EMOJI_TAIL), mapping, content)
+        # No guard: 'inlineEmojis' is this message's own array, so the export already says
+        # each of these was used in this very body
+        content, used, _ = _apply(_compile(mapping, _EMOJI_TAIL), mapping, content)
         self.recovered["emoji"] += len(used)
         return content
 
@@ -258,7 +282,9 @@ class Unresolver:
         if not mapping:
             return content
 
-        content, used = _apply(_compile(mapping, tail), mapping, content)
+        # No guard either, and for the same reason: these come from the message's own
+        # channelMentions/roleMentions, which the exporter read out of this body
+        content, used, _ = _apply(_compile(mapping, tail), mapping, content)
         self.recovered[kind] += len(used)
         _collect(found, kind, used)
         return content
@@ -282,25 +308,30 @@ class Unresolver:
         absent = sum(1 for token in names if token not in content)
 
         pattern = _compile(names, _NAME_TAIL)
-        content, used = _apply(pattern, names, content)
+        # No guard: 'mentions' is the message's own array. An account cannot be mentioned
+        # before it exists, so there is nothing a date could rule out here.
+        content, used, _ = _apply(pattern, names, content)
 
         self.recovered["user"] += len(used)
         self.not_in_body["user"] += absent
         return content
 
-    def _unresolve_roles(self, content: str, found=None) -> str:
+    def _unresolve_roles(self, content: str, found=None, allow=None) -> str:
         if not self.roles:
             return content
         if self._role_pattern is None:
             self._role_map = {f"@{name}": f"<@&{i}>" for name, i in self.roles.items()}
             self._role_pattern = _compile(self._role_map, _NAME_TAIL)
 
-        content, used = _apply(self._role_pattern, self._role_map, content)
+        content, used, rejected = _apply(
+            self._role_pattern, self._role_map, content, allow
+        )
         self.recovered["role"] += len(used)
+        self.anachronistic["role"] += rejected
         _collect(found, "role", used)
         return content
 
-    def _unresolve_channels(self, content: str, found=None) -> str:
+    def _unresolve_channels(self, content: str, found=None, allow=None) -> str:
         if not self.channels:
             return content
         if self._channel_pattern is None:
@@ -315,8 +346,11 @@ class Unresolver:
             self._channel_map = mapping
             self._channel_pattern = _compile(mapping, _CHANNEL_TAIL)
 
-        content, used = _apply(self._channel_pattern, self._channel_map, content)
+        content, used, rejected = _apply(
+            self._channel_pattern, self._channel_map, content, allow
+        )
         self.recovered["channel"] += len(used)
+        self.anachronistic["channel"] += rejected
         _collect(found, "channel", used)
         return content
 
@@ -354,28 +388,65 @@ def _compile(mapping: dict[str, str], tail: str) -> re.Pattern:
 
 
 def _apply(
-    pattern: re.Pattern, mapping: dict[str, str], content: str
-) -> tuple[str, list[str]]:
+    pattern: re.Pattern, mapping: dict[str, str], content: str, allow=None
+) -> tuple[str, list[str], int]:
     """Substitute, and report every raw form that was put in.
 
     The replacements are returned rather than merely counted, because a channel or role
     mention put back into a body is also a fact worth recording in its own table, and the
     raw form is where its ID is.  Repeats are kept: the count is a count of substitutions.
+
+    ``allow``, when given, gets a veto over each candidate replacement.  A rejected match is
+    left exactly as it was found, which is the whole point: the text was never a mention, so
+    the right outcome is to not touch it.  Rejections are returned separately.
     """
     used: list[str] = []
+    rejected = 0
 
     def swap(match: re.Match) -> str:
+        nonlocal rejected
         replacement = mapping.get(match.group(0))
         if replacement is None:  # pragma: no cover -- the pattern is built from the mapping
+            return match.group(0)
+        if allow is not None and not allow(replacement):
+            rejected += 1
             return match.group(0)
         used.append(replacement)
         return replacement
 
-    return pattern.sub(swap, content), used
+    return pattern.sub(swap, content), used, rejected
 
 
 #: The raw form of a channel or role mention, whose only variable part is the ID.
 _RAW_TARGET = re.compile(r"<(?:#|@&)(\d+)>")
+
+
+def _not_newer_than(as_of: int | None):
+    """A veto on any candidate whose target did not exist yet when the body was written.
+
+    Every Discord ID encodes its own creation time, so for a channel or role mention the raw
+    form alone says whether the target could possibly have been referred to.  The pooled
+    name-to-ID map is not vintage-aware -- it spans the whole run -- so without this a 2016
+    message reading ``#nv2.0`` (an IRC channel, on Rizon) gets rewritten to a Discord channel
+    of that name created in 2023.  Measured on a real archive, this is about 1 in 70 channel
+    mentions, and every one of them is text that was never a mention at all.
+
+    Returns ``None`` when there is nothing to compare against, which disables the check rather
+    than dropping everything.
+    """
+    if as_of is None:
+        return None
+
+    def allow(replacement: str) -> bool:
+        match = _RAW_TARGET.fullmatch(replacement)
+        if match is None:  # not a channel or role; nothing to date
+            return True
+        created = snowflake_timestamp(match.group(1))
+        # Compared in whole seconds, as everything else here is, so a target created within
+        # the same second as the message is kept
+        return created is None or created <= as_of
+
+    return allow
 
 
 def _collect(found, kind: str, used: list[str]) -> None:

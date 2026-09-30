@@ -19,7 +19,7 @@ import pytest
 from conftest import fixture
 from support import diff, import_files, rows, snapshot
 
-from dce2sql.documents import Document, Person
+from dce2sql.documents import Document, Person, _written_by
 from dce2sql.mentions import ChannelIndex, Unresolver
 from dce2sql.reader import Source, open_document
 
@@ -871,3 +871,194 @@ class TestRecordingWhatWasPutBack:
         assert rows(
             db, "SELECT name FROM channels WHERE id = ?", (int(self.CHANNEL_ID),)
         ) == [("support",)]
+
+
+class TestVintage:
+    """Nothing is put back that did not exist when the body was written.
+
+    The pooled name-to-ID map spans the whole run, so on its own it is happy to rewrite text
+    that merely looks like a mention into a channel created years later. Found in a real
+    archive: a 2016 message reading ``lol, went to #nv2.0 in rizon`` -- an IRC channel, on
+    Rizon -- became a Discord channel of that name created in 2023.
+
+    The guard covers the pooled lookups only. A message's own ``mentions``, ``inlineEmojis``,
+    ``channelMentions`` and ``roleMentions`` are the export stating that this very message
+    referred to these very things, which no arithmetic can overrule -- and for users a date
+    check would be actively wrong: see :meth:`test_a_deleted_user_is_still_put_back`.
+    """
+
+    #: A real 2016 message, and a real channel created 2023-03-27
+    OLD_MESSAGE = "204050714543128576"
+    NEW_CHANNEL = "1090054078689718324"
+    NEW_ROLE = "1090054078689718325"
+
+    def _unresolver(self):
+        index = ChannelIndex()
+        index.add(self.NEW_CHANNEL, "nv2.0", "test")
+        unresolver = Unresolver(index)
+        unresolver.add_roles([{"id": self.NEW_ROLE, "name": "Archivist"}])
+        return unresolver
+
+    def _sent(self, message_id=None):
+        from dce2sql.util import snowflake_timestamp
+
+        return snowflake_timestamp(message_id or self.OLD_MESSAGE)
+
+    # -- the guard ------------------------------------------------------------------------
+
+    def test_a_pooled_channel_newer_than_the_message_is_left_alone(self):
+        unresolver = self._unresolver()
+        body = "lol, went to #nv2.0 in rizon"
+        assert unresolver.unresolve(body, as_of=self._sent()) == body
+        assert unresolver.anachronistic["channel"] == 1
+        assert unresolver.recovered["channel"] == 0
+
+    def test_a_pooled_role_newer_than_the_message_is_left_alone(self):
+        unresolver = self._unresolver()
+        body = "ask an @Archivist"
+        assert unresolver.unresolve(body, as_of=self._sent()) == body
+        assert unresolver.anachronistic["role"] == 1
+
+    def test_the_same_text_is_put_back_once_the_channel_exists(self):
+        """Not a blanket refusal: after the channel is made, the text is a real mention."""
+        unresolver = self._unresolver()
+        later = self._sent("1200000000000000000")
+        assert unresolver.unresolve("see #nv2.0", as_of=later) == (
+            f"see <#{self.NEW_CHANNEL}>"
+        )
+        assert sum(unresolver.anachronistic.values()) == 0
+
+    def test_no_date_at_all_disables_the_check_rather_than_everything(self):
+        unresolver = self._unresolver()
+        assert unresolver.unresolve("see #nv2.0", as_of=None) == (
+            f"see <#{self.NEW_CHANNEL}>"
+        )
+        assert sum(unresolver.anachronistic.values()) == 0
+
+    # -- where the cutoff comes from -------------------------------------------------------
+
+    def test_an_edit_moves_the_cutoff(self):
+        """A message sent before the channel but edited after it may well name it.
+
+        Not hypothetical: in the archive this was measured on, one recovered mention survives
+        only because of this -- sent 13:44:50, channel created 13:50:56, edited 13:52:23.
+        """
+        raw = {
+            "id": self.OLD_MESSAGE,
+            "timestamp": "2016-07-17T01:44:41.426+00:00",
+            "timestampEdited": "2023-04-01T00:00:00.000+00:00",
+        }
+        unresolver = self._unresolver()
+        assert unresolver.unresolve("see #nv2.0", as_of=_written_by(raw)) == (
+            f"see <#{self.NEW_CHANNEL}>"
+        )
+
+    def test_without_an_edit_the_cutoff_is_when_it_was_sent(self):
+        raw = {"id": self.OLD_MESSAGE, "timestamp": "2016-07-17T01:44:41.426+00:00"}
+        assert _written_by(raw) == self._sent()
+
+    def test_a_missing_timestamp_falls_back_to_the_message_id(self):
+        # Every ID encodes when it was sent, so there is always something to compare against
+        assert _written_by({"id": self.OLD_MESSAGE}) == self._sent()
+
+    # -- what the guard must keep its hands off --------------------------------------------
+
+    def test_a_channel_the_export_names_itself_is_never_refused(self):
+        """The export says this message mentioned it, which outranks any arithmetic."""
+        unresolver = Unresolver(ChannelIndex())
+        named = {"id": self.NEW_CHANNEL, "name": "nv2.0", "type": "GuildTextChat"}
+        assert unresolver.unresolve(
+            "see #nv2.0", channels=[named], as_of=self._sent()
+        ) == f"see <#{self.NEW_CHANNEL}>"
+        assert sum(unresolver.anachronistic.values()) == 0
+
+    def test_a_role_the_export_names_itself_likewise(self):
+        unresolver = Unresolver(ChannelIndex())
+        named = {"id": self.NEW_ROLE, "name": "Archivist"}
+        assert unresolver.unresolve(
+            "ask an @Archivist", roles=[named], as_of=self._sent()
+        ) == f"ask an <@&{self.NEW_ROLE}>"
+        assert sum(unresolver.anachronistic.values()) == 0
+
+    def test_a_deleted_user_is_still_put_back(self):
+        """Discord reassigns a deleted account's mentions to one sentinel account.
+
+        That account was created in 2018, so in a 2016 export it counts as newer than the
+        message -- 1,613 times over in the archive this was measured on. Guarding users by
+        date would refuse every one of them, which is why users are not guarded at all.
+        """
+        from dce2sql.util import DELETED_USER_ID
+
+        unresolver = self._unresolver()
+        sentinel = person(str(DELETED_USER_ID), "Deleted User")
+        assert unresolver.unresolve(
+            "thanks @Deleted User", people=[sentinel], as_of=self._sent()
+        ) == f"thanks <@{DELETED_USER_ID}>"
+
+    def test_an_emoji_created_after_the_message_is_still_put_back(self):
+        """All three such cases in the archive are messages edited afterwards.
+
+        The array is this message's own either way, so there is nothing to second-guess.
+        """
+        unresolver = self._unresolver()
+        emoji = [{"id": "947930721773838386", "name": "moleSmile", "isAnimated": False}]
+        assert unresolver.unresolve(
+            "nice :moleSmile:", emojis=emoji, as_of=self._sent()
+        ) == "nice <:moleSmile:947930721773838386>"
+
+    # -- end to end -------------------------------------------------------------------------
+
+    def test_a_refused_match_is_not_recorded_as_a_mention_either(self, tmp_path):
+        from dce2sql.adapters import create
+        from dce2sql.importer import Importer
+
+        document = {
+            "mod": {"normal": False, "extended": False, "markdown": True},
+            "guild": {"id": "1", "name": "g", "iconUrl": ""},
+            "channel": {"id": "2", "name": "c", "type": "GuildTextChat"},
+            "dateRange": {"after": None, "before": None},
+            "messages": [
+                {
+                    "id": self.OLD_MESSAGE,
+                    "type": "Default",
+                    "timestamp": "2016-07-17T01:44:41.426+00:00",
+                    "content": "lol, went to #nv2.0 in rizon",
+                    "author": {
+                        "id": "5",
+                        "name": "a",
+                        "discriminator": "0000",
+                        "nickname": "a",
+                        "isBot": False,
+                        "roles": [],
+                        "avatarUrl": "",
+                    },
+                    "mentions": [],
+                    "inlineEmojis": [],
+                }
+            ],
+            "messageCount": 1,
+        }
+        path = tmp_path / "irc.json"
+        with path.open("w", encoding="utf-8") as handle:
+            json.dump(document, handle, ensure_ascii=False)
+
+        db = tmp_path / "irc.db"
+        adapter = create("sqlite", str(db))
+        adapter.connect()
+        try:
+            adapter.create_schema()
+            source = Source.of(path)
+            result = Importer(adapter).import_document(
+                Document(open_document(source), self._unresolver()), source
+            )
+            assert result.error is None, result.error
+        finally:
+            adapter.close()
+
+        assert rows(db, "SELECT COUNT(*) FROM channel_mentions") == [(0,)]
+        assert rows(db, "SELECT content FROM messages") == [
+            ("lol, went to #nv2.0 in rizon",)
+        ], "the body keeps the text it always had"
+        assert rows(
+            db, "SELECT COUNT(*) FROM channels WHERE id = ?", (int(self.NEW_CHANNEL),)
+        ) == [(0,)], "and no phantom channel row was invented for it"

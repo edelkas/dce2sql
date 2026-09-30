@@ -122,6 +122,18 @@ def render(stats: Stats, console=None, dry_run: bool = False) -> None:
             f"{len(unresolver.channels):,} channel and {len(unresolver.roles):,} role name(s)",
             soft_wrap=True,
         )
+        anachronistic = sum(unresolver.anachronistic.values())
+        if anachronistic:
+            kinds = ", ".join(
+                f"{n:,} {kind}" for kind, n in unresolver.anachronistic.most_common() if n
+            )
+            console.print(
+                f"  Left alone as too new: {anachronistic:,} ({kinds})"
+                "  [dim]-- the channel or role did not exist yet, so the text was never"
+                " a mention[/dim]",
+                soft_wrap=True,
+            )
+
         if unresolver.channels.collisions:
             console.print(
                 f"  [yellow]{unresolver.channels.collisions:,} channel name(s) map to more "

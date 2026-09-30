@@ -139,10 +139,24 @@ Each kind is recovered from whatever the message itself says, wherever possible:
 | Role | its own `roleMentions` (`--extended`), else the server's role list |
 
 So a body is only ever rewritten to name something it already says it used. The pooled channel
-map is the one place guesswork enters: it draws on the exports being imported, on a `channels`
-listing if you give one, and on the database — in that order, so a name of the right vintage
-wins over a later one. An `--extended` export needs none of it. Keeping a `channels` listing
-alongside each batch is what makes the rest reliable.
+and role maps are the one place guesswork enters: the channel one draws on the exports being
+imported, on a `channels` listing if you give one, and on the database — in that order, so a name
+of the right vintage wins over a later one. An `--extended` export needs none of it. Keeping a
+`channels` listing alongside each batch is what makes the rest reliable.
+
+Because those two maps span the whole run rather than one moment, they are also **checked against
+the clock**: a channel or role whose ID says it was created after the message was written cannot
+be what the message meant, so the text is left exactly as it was found and the run reports it as
+`Left alone as too new`. This is not a rare correction — on a real 2016 archive it rejects about
+1 in 70 channel matches, including a message reading `lol, went to #nv2.0 in rizon`, an *IRC*
+channel that happened to share its name with a Discord one created seven years later. The cutoff
+is the message's edit time where it has one, not when it was sent, since a message edited later
+may perfectly well name something newer than itself.
+
+The check applies to the pooled maps only. Users and custom emoji come from the message's own
+`mentions` and `inlineEmojis` arrays, so there is nothing to second-guess — and dating users would
+be wrong outright: Discord reassigns a deleted account's mentions to a single sentinel account
+created in 2018, which turns up 1,613 times in that same 2016-onwards archive.
 
 With everything in place this is not an approximation: on the test corpus it reproduces DCE's
 own `--markdown false` output byte for byte, for all 230 message bodies.
