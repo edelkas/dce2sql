@@ -170,6 +170,41 @@ or when you want the indexing and query planning that `JSONB` and a real timesta
 Whichever you choose, the archive is the same: the suite imports the same exports into all
 three and asserts the resulting databases match, row for row.
 
+## Upgrading an archive built by an older version
+
+The tool creates tables but never alters them, so a column added to the schema does not appear
+in a database that already exists. Importing into one without migrating it first fails per
+file, loudly and without writing anything:
+
+```
+failed roster.json: OperationalError: table users has no column named registered_at
+```
+
+Rebuilding from the exports is always an option, and is the simplest one if you still have
+them. Otherwise add the column by hand. The most recent addition is `users.registered_at`
+(when the account was created), which can be backfilled entirely from the IDs already in the
+table, since every Discord snowflake encodes its own creation time:
+
+```sql
+-- SQLite
+ALTER TABLE users ADD COLUMN registered_at INTEGER;
+UPDATE users SET registered_at = ((id >> 22) + 1420070400000) / 1000;
+CREATE INDEX ix_users_registered_at ON users (registered_at);
+
+-- MySQL (run with the session in UTC, as the tool does: SET time_zone = '+00:00')
+ALTER TABLE users ADD COLUMN registered_at DATETIME NULL;
+UPDATE users SET registered_at = FROM_UNIXTIME(((id >> 22) + 1420070400000) DIV 1000);
+CREATE INDEX ix_users_registered_at ON users (registered_at);
+
+-- PostgreSQL
+ALTER TABLE users ADD COLUMN registered_at TIMESTAMPTZ;
+UPDATE users SET registered_at = to_timestamp(((id >> 22) + 1420070400000) / 1000);
+CREATE INDEX ix_users_registered_at ON users (registered_at);
+```
+
+That backfill is not an approximation: it produces exactly the values a fresh import would
+write, which is asserted against all three engines in the suite.
+
 ## Documentation
 
 - [docs/SQL.md](docs/SQL.md) — the database schema, table by table

@@ -192,6 +192,10 @@ USERS = _base(
     Column("bot", BOOL, index=True),
     Column("avatar", URL),
     Column("banner", URL),
+    #: When the *account* was created, as opposed to 'created_at', which is when this row was.
+    #: Never unknown: an export that predates DCE writing 'createdAt' has it recomputed from
+    #: the ID, since every snowflake encodes its own creation time.
+    Column("registered_at", TS),
     Column("deleted", BOOL, null=False, default=False),
     comment="Discord accounts, global. Guild-specific profiles live in 'members'.",
 )

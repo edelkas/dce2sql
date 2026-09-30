@@ -9,9 +9,11 @@ richer one, an edit is recorded rather than overwritten.
 from __future__ import annotations
 
 import json
+from datetime import datetime, timedelta, timezone
 
 import pytest
 from conftest import fixture
+from dce2sql.util import DISCORD_EPOCH_MS
 from support import diff, import_files, regressions, rows, snapshot, with_rich_json
 
 #: The four exports carrying the full field set, grouped by how they write people.  Within a
@@ -489,6 +491,44 @@ class TestUsersAndMembers:
         )
         assert orphans == [(0,)]
 
+    def test_every_user_gets_an_account_creation_date(self, imported):
+        """'registered_at' is the one user column that is never unknown.
+
+        Every other field depends on what the export chose to carry; this one is recoverable
+        from the primary key itself, so a row missing it would mean a bug rather than a poorer
+        export.
+        """
+        for name in EXTENDED_SHAPES + ["vanilla.json", "upstream.json", "roster.json"]:
+            db = imported(name)
+            assert rows(
+                db, "SELECT COUNT(*) FROM users WHERE registered_at IS NULL"
+            ) == [(0,)], name
+
+    def test_a_stated_creation_date_and_a_recomputed_one_agree(self, tmp_path, imported):
+        """The fallback has to be exact, not merely plausible.
+
+        These fixtures predate DCE writing 'createdAt', so they exercise the snowflake path.
+        Restating the same dates explicitly must not move a single row, or an archive built
+        from exports of mixed vintage would disagree with itself.
+        """
+        recomputed = rows(
+            imported("roster.json"), "SELECT id, registered_at FROM users ORDER BY id"
+        )
+
+        db = tmp_path / "stated.db"
+        import_files(db, _state_created_at(tmp_path, "roster.json"))
+        stated = rows(db, "SELECT id, registered_at FROM users ORDER BY id")
+
+        assert stated == recomputed
+
+    def test_an_account_is_never_created_after_it_joined(self, imported):
+        # A weak claim, but the one that would actually catch a wrong epoch or a bad shift
+        assert rows(
+            imported("roster.json"),
+            "SELECT COUNT(*) FROM users u JOIN members m ON m.user_id = u.id "
+            "WHERE m.joined_at IS NOT NULL AND u.registered_at > m.joined_at",
+        ) == [(0,)]
+
     def test_a_deleted_account_flags_the_user_without_losing_the_author(self, tmp_path):
         db = tmp_path / "archive.db"
         import_files(db, fixture("split.json"))
@@ -580,6 +620,30 @@ def _edit_message(tmp_path, name, message_id, content):
     else:  # pragma: no cover
         raise AssertionError(f"{message_id} not in {name}")
     return _write(tmp_path, "edited.json", document)
+
+
+def _state_created_at(tmp_path, name):
+    """Write 'createdAt' onto every user of a roster, as a current DCE build would.
+
+    Rendered with a non-UTC offset and millisecond precision, which is what an export made
+    without --utc actually looks like.
+    """
+    document = _load(name)
+    offset = timezone(timedelta(hours=2))
+
+    def stated(user_id):
+        milliseconds = (int(user_id) >> 22) + DISCORD_EPOCH_MS
+        moment = datetime.fromtimestamp(milliseconds / 1000, offset)
+        return moment.isoformat(timespec="milliseconds")
+
+    for entry in document["members"]:
+        user = entry.get("user")
+        if user is not None:
+            user["createdAt"] = stated(user["id"])
+    for user in document.get("users") or []:
+        user["createdAt"] = stated(user["id"])
+
+    return _write(tmp_path, "stated-" + name, document)
 
 
 def _reassign_author(tmp_path, name, message_id):

@@ -121,6 +121,7 @@ Users are Discord accounts. They differ from [Members](#members-table) in that t
 | bot | Boolean | isBot | Whether this user is a bot account |
 | avatar | String | avatarUrl | The avatar's image URL |
 | banner | String | bannerUrl | The banner's image URL |
+| registered_at | Timestamp | createdAt | When the account was created |
 | deleted | Boolean | - | Whether this user has been deleted since first being archived |
 
 The `avatar` and `banner` here are the account's *global* images. A member who has set a guild-specific avatar or banner is shown wearing it in a merged export, in place of the global one, so for those people a merged export cannot supply this column at all and leaves it empty rather than storing the guild image in it. The guild image goes to [`members`](#members-table), from either kind of export: it is recognisable by its CDN path, `/guilds/{guild}/users/{user}/avatars/...` rather than `/avatars/{user}/...`.
@@ -129,9 +130,19 @@ Note that the banner URL is only included in the extended fork, and that the dis
 
 Note that the JSON exports encode the discriminator as a string, so it needs to be casted. They are being phased out by Discord, which means most of them will usually be 0. It also encodes the color as a hex string, so it needs to be packed. The color may be NULL, which denotes the default one.
 
+`registered_at` is when the *account* was created, and is not to be confused with `created_at`, which every table carries and which records when the row itself was first written. It is deliberately not named `created_at`-anything for that reason.
+
+It is the only column here that is never unknown, and the only one that does not depend on what the export chose to carry. No Discord endpoint returns an account's creation date, so the extended fork does not read it from the API either: every Discord ID is a snowflake whose top 42 bits are milliseconds since Discord's own epoch (`1420070400000`, i.e. 2015-01-01T00:00:00Z), so
+
+```
+registered_at = (id >> 22) + 1420070400000
+```
+
+to the millisecond, which the importer then truncates to whole seconds like every other timestamp. Recent exports state the value as `createdAt` and it is read from there; anything older — including every vanilla export, which will never have the field — has it recomputed from the ID. The two agree exactly, so an archive assembled from exports of mixed vintage stays consistent. The same arithmetic recovers a creation date for any other snowflake, which is why no equivalent column is needed on `messages`, `channels`, `roles` or `guilds`: their primary keys already carry it.
+
 The `deleted` field, which should default to `false`, isn't present in the JSON exports, as in fact, it's impossible to detect it from one export, a comparison between different exports is required. The reason is that all messages by deleted users are automatically assigned to a special user with ID `456226577798135808` and name `Deleted User` by Discord. Thus, all deleted users which weren't previously archived will be lumped into this special user.
 
-For performance, a simple index shall be placed in the `name`, `display` and `bot` fields.
+For performance, a simple index shall be placed in the `name`, `display` and `bot` fields. `registered_at` is indexed too, by the general rule that every timestamp column is.
 
 ### Messages table
 

@@ -5,7 +5,13 @@ from __future__ import annotations
 import pytest
 
 from dce2sql import enums
-from dce2sql.util import color, discriminator, snowflake, timestamp
+from dce2sql.util import (
+    color,
+    discriminator,
+    snowflake,
+    snowflake_timestamp,
+    timestamp,
+)
 
 
 class TestSnowflake:
@@ -54,6 +60,45 @@ class TestTimestamp:
 
     def test_rejects_rubbish(self):
         assert timestamp("yesterday") is None
+
+
+class TestSnowflakeTimestamp:
+    """Recovering a creation date from an ID, which is the only place Discord keeps one."""
+
+    def test_decodes_a_known_id(self):
+        # Ground truth: this is what Discord itself reports for the account, and the value
+        # DCE now writes as 'createdAt' for it
+        assert snowflake_timestamp("66155023779758080") == timestamp(
+            "2015-07-02T13:16:26.770+00:00"
+        )
+
+    def test_agrees_with_the_field_it_stands_in_for(self):
+        # The whole point of the fallback: an export that states the date and one that does
+        # not must land on the same number, or an archive would disagree with itself about
+        # when an account was made depending on which export happened to mention it
+        for value, stated in [
+            ("57595500404146176", "2015-06-08T22:23:57.369+00:00"),
+            # Deliberately not UTC: 'createdAt' carries the exporting machine's offset unless
+            # --utc was passed, so the two only agree once that has been normalized away
+            ("197765375503368192", "2016-06-29T19:28:59.823+02:00"),
+            ("1282519086105886753", "2024-09-08T18:52:58.180-07:00"),
+        ]:
+            assert snowflake_timestamp(value) == timestamp(stated), value
+
+    def test_the_epoch_is_discords_own(self):
+        # The smallest usable snowflake lands on 2015-01-01T00:00:00Z, not on the Unix epoch
+        assert snowflake_timestamp(1 << 22) == timestamp("2015-01-01T00:00:00Z")
+
+    def test_accepts_the_integer_form_too(self):
+        # Callers hand it an already-parsed ID, not the string from the JSON
+        assert snowflake_timestamp(66155023779758080) == snowflake_timestamp(
+            "66155023779758080"
+        )
+
+    @pytest.mark.parametrize("value", [None, "", "   ", "not-an-id", 0, -1])
+    def test_rejects_what_is_not_an_id(self, value):
+        # 0 would otherwise decode to Discord's epoch and read as a real date
+        assert snowflake_timestamp(value) is None
 
 
 class TestEnums:

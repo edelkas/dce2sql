@@ -33,6 +33,30 @@ def snowflake(value) -> int | None:
         return None
 
 
+#: Discord's own epoch, 2015-01-01T00:00:00Z, in milliseconds.  Every snowflake counts from here.
+DISCORD_EPOCH_MS = 1420070400000
+
+
+def snowflake_timestamp(value) -> int | None:
+    """Recover the creation instant encoded in a Discord ID, as a Unix timestamp in UTC.
+
+    No Discord endpoint returns an account's creation date, because every ID already carries
+    it: the top 42 bits of a snowflake are milliseconds since Discord's own epoch.  Newer DCE
+    exports write it out as ``createdAt``, but an older one need not -- and it never has to be
+    guessed at, since the ID is always present.
+
+    This is exact rather than approximate, and it applies to any snowflake: a message, channel,
+    role or guild creation date comes out of its ID the same way.
+    """
+    parsed = snowflake(value)
+    if parsed is None or parsed <= 0:
+        # 0 is not an ID any account can have, and a negative one is not a snowflake at all
+        return None
+    # Truncated to whole seconds exactly as timestamp() does, so a recomputed value and one
+    # parsed from 'createdAt' agree to the second rather than differing by a rounding
+    return ((parsed >> 22) + DISCORD_EPOCH_MS) // 1000
+
+
 def discriminator(value) -> int | None:
     """Parse the 4-digit discriminator, written as a zero-padded string ('0001', '0000').
 

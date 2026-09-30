@@ -46,6 +46,7 @@ from .util import (
     color,
     discriminator,
     snowflake,
+    snowflake_timestamp,
     timestamp,
 )
 
@@ -1048,6 +1049,14 @@ def _user_record(user_id: int, user: dict) -> dict[str, Any]:
         record["avatar"] = user["avatarUrl"]
     if "bannerUrl" in user:
         record["banner"] = user["bannerUrl"]
+    # The one field that is never merely absent.  Newer exports state it; older ones don't have
+    # to, because the ID they are keyed by encodes it anyway -- so unlike every other column
+    # here this one is always written rather than only when the document carries it.
+    record["registered_at"] = (
+        timestamp(user["createdAt"])
+        if user.get("createdAt") is not None
+        else snowflake_timestamp(user_id)
+    )
     return record
 
 

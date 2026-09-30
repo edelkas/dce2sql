@@ -298,7 +298,7 @@ In vanilla DCE exports, both user and member information are combined, and it ha
 
 Note that `color` can be NULL, which denotes the user names takes the default color. Deleted users always show with ID 456226577798135808 and name "Deleted User".
 
-The extended fork also includes the following fields, all related to the member except `displayName`:
+The extended fork also includes the following fields, all related to the member except `displayName` and `createdAt`:
 
 ```
 {
@@ -307,9 +307,12 @@ The extended fork also includes the following fields, all related to the member 
   "premiumSince": String,
   "isPending": Boolean,
   "flags": Array<String>,
-  "bannerUrl": String
+  "bannerUrl": String,
+  "createdAt": String
 }
 ```
+
+`createdAt` is when the *account* was created, as against `joinedAt`, which is when it joined the guild. It is unlike every other field in the export in not coming from the API at all: no Discord endpoint returns an account creation date, because every ID is a snowflake that already encodes one in its top 42 bits. A consumer that wants it from an export too old to state it can therefore compute it rather than treat it as missing — `(id >> 22) + 1420070400000` gives milliseconds since the Unix epoch — and the two are equal, not merely close. This is what `dce2sql` does to fill [`users.registered_at`](SQL.md#users-table) for older exports, and the same arithmetic works on any other snowflake.
 
 #### Names
 
@@ -358,6 +361,7 @@ With the fork's `splitUsers` option, the two objects are written apart. The user
   "isBot": Boolean,
   "avatarUrl": String,
   "bannerUrl": String,
+  "createdAt": String,
   "member": Object
 }
 ```
@@ -596,6 +600,8 @@ The `mod` object here has just two keys:
 ```
 
 `fullUsers` is provenance for one field. The user object nested in a roster entry is a *partial* one: Discord sends `banner` as null on it regardless of whether the account has one. Only a dedicated per-user fetch carries it, which costs one request per member and so is opt-in. When `fullUsers` is false, a null `bannerUrl` on a user means "not known" rather than "not set".
+
+A roster has no `extended` flag of its own — the whole document is an addition to vanilla DCE — so the nested user object carries `createdAt` unconditionally, unlike in a message export where it is one of the `--extended` fields.
 
 The `guild` object carries the extended fields described in [Guild object](#guild-object), minus the emoji and sticker inventories — this document is about people. Under `--normal` the roster's users go to a root `users` table and the guild's full role inventory to a root `roles` table, exactly as in a message export.
 
